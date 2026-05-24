@@ -1,18 +1,8 @@
 {
-  "updatedAt": "2026-05-24T18:51:34.304Z",
+  "updatedAt": "2026-05-24T18:51:46.787Z",
   "app": "SZR OS",
   "data": {
-    "transactions": [
-      {
-        "id": "b03a048a-b35d-4ae1-9bfe-3d827493b6dd",
-        "type": "income",
-        "amount": 711,
-        "description": "Pago",
-        "category": "Trabajo",
-        "paymentMethod": null,
-        "date": "2026-05-24T18:51:33.132Z"
-      }
-    ],
+    "transactions": [],
     "tasks": [],
     "ideas": [],
     "daily": {
