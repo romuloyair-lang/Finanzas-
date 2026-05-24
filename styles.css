@@ -82,6 +82,7 @@ h2 { margin: 0; font-size: 18px; letter-spacing: -0.3px; }
   flex: 1; min-height: 58px; border: 0; border-radius: 22px; color: white;
   font-size: 15px; font-weight: 700; box-shadow: var(--shadow);
 }
+.action-card.active { outline: 3px solid rgba(255,255,255,0.42); transform: translateY(-1px); }
 .income { background: linear-gradient(135deg, #1ebc61, #30d158); }
 .expense { background: linear-gradient(135deg, #ff453a, #ff2d55); }
 .neutral { background: linear-gradient(135deg, #2d3748, #111827); }
@@ -97,12 +98,19 @@ h2 { margin: 0; font-size: 18px; letter-spacing: -0.3px; }
 .segmented input:checked + label { background: var(--accent-2); color: white; }
 .field { display: block; margin: 10px 0; }
 .field span { display: block; color: var(--muted); font-size: 12px; margin: 0 0 6px 4px; }
-input, select {
+input, select, textarea {
   width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 16px;
   background: var(--card-strong); color: var(--text); padding: 0 13px; font-size: 16px;
   outline: none;
 }
-input::placeholder { color: var(--muted); }
+textarea {
+  min-height: 140px;
+  padding: 13px;
+  resize: vertical;
+  line-height: 1.4;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent-2); box-shadow: 0 0 0 3px rgba(10,132,255,0.18); }
+input::placeholder, textarea::placeholder { color: var(--muted); }
 .two-col > * { flex: 1; }
 .primary-button, .secondary-button {
   width: 100%; border: 0; border-radius: 18px; min-height: 52px; color: white;
@@ -111,6 +119,7 @@ input::placeholder { color: var(--muted); }
 .primary-button { background: linear-gradient(135deg, var(--accent), #ff2d55); }
 .secondary-button { background: linear-gradient(135deg, var(--accent-2), #64d2ff); }
 .text-button { background: none; border: 0; color: var(--accent); font-weight: 700; }
+.helper-text { color: var(--muted); font-size: 12px; line-height: 1.35; margin: 10px 4px 0; }
 .goal-card { background: var(--card-strong); border-radius: 22px; padding: 14px; }
 .progress { height: 12px; background: rgba(128,128,128,0.25); border-radius: 99px; margin: 14px 0; overflow: hidden; }
 .progress span { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--yellow)); border-radius: inherit; }
