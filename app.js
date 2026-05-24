@@ -3,12 +3,17 @@ const STORAGE_KEY = "szr-finance-v2";
 const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   transactions: [],
   goal: { name: "", target: 0, saved: 0 },
+  bank: { cash: 0, creditLimit: 0, creditUsed: 0 },
   theme: "dark",
   notes: ""
 };
 
 if (!Object.prototype.hasOwnProperty.call(state, "notes")) {
   state.notes = "";
+}
+
+if (!Object.prototype.hasOwnProperty.call(state, "bank")) {
+  state.bank = { cash: 0, creditLimit: 0, creditUsed: 0 };
 }
 
 const $ = (id) => document.getElementById(id);
@@ -30,20 +35,37 @@ function setActiveQuickAction(type) {
 
 function render() {
   setTheme();
+
   const income = state.transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const expenses = state.transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   const balance = income - expenses;
   const free = balance - (Number(state.goal.saved) || 0);
 
+  const cash = Number(state.bank.cash) || 0;
+  const creditLimit = Number(state.bank.creditLimit) || 0;
+  const creditUsed = Number(state.bank.creditUsed) || 0;
+  const creditAvailable = Math.max(0, creditLimit - creditUsed);
+  const totalAvailable = cash + creditAvailable;
+
   $("balanceAmount").textContent = money(balance);
   $("incomeAmount").textContent = money(income);
   $("expenseAmount").textContent = money(expenses);
   $("freeAmount").textContent = money(free);
+
+  $("cashAvailableAmount").textContent = money(cash);
+  $("creditAvailableAmount").textContent = money(creditAvailable);
+  $("totalBankAvailableAmount").textContent = money(totalAvailable);
+
+  $("bankCash").value = cash || "";
+  $("creditLimit").value = creditLimit || "";
+  $("creditUsed").value = creditUsed || "";
+
   $("todayLabel").textContent = new Date().toLocaleDateString("es-MX", { weekday: "long", month: "short", day: "numeric" });
 
   $("goalName").value = state.goal.name || "";
   $("goalTarget").value = state.goal.target || "";
   $("goalSaved").value = state.goal.saved || "";
+
   const notesBox = $("changeNotes");
   if (notesBox) notesBox.value = state.notes || "";
 
@@ -60,6 +82,7 @@ function render() {
     list.textContent = "Sin movimientos todavía.";
     return;
   }
+
   list.className = "transaction-list";
   list.innerHTML = state.transactions.slice().reverse().map(t => `
     <div class="transaction-row">
@@ -87,15 +110,28 @@ function addTransaction(type = null) {
   const amount = Number($("amount").value);
   const description = $("description").value.trim();
   const category = $("category").value;
+
   if (!description || !amount || amount <= 0) return;
-  state.transactions.push({ id: crypto.randomUUID(), type: selectedType, amount, description, category, date: new Date().toISOString() });
+
+  state.transactions.push({
+    id: crypto.randomUUID(),
+    type: selectedType,
+    amount,
+    description,
+    category,
+    date: new Date().toISOString()
+  });
+
   save();
   $("transactionForm").reset();
   $("typeIncome").checked = true;
   render();
 }
 
-$("transactionForm").addEventListener("submit", (e) => { e.preventDefault(); addTransaction(); });
+$("transactionForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  addTransaction();
+});
 
 document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -117,6 +153,18 @@ $("saveGoal").addEventListener("click", () => {
     target: Number($("goalTarget").value) || 0,
     saved: Number($("goalSaved").value) || 0
   };
+
+  save();
+  render();
+});
+
+$("saveBank").addEventListener("click", () => {
+  state.bank = {
+    cash: Number($("bankCash").value) || 0,
+    creditLimit: Number($("creditLimit").value) || 0,
+    creditUsed: Number($("creditUsed").value) || 0
+  };
+
   save();
   render();
 });
