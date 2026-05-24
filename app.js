@@ -28,10 +28,17 @@ function setActiveQuickAction(type) {
   });
 }
 
+function togglePaymentMethod() {
+  const type = document.querySelector('input[name="type"]:checked')?.value;
+  const field = $("paymentMethodField");
+  field.style.display = type === "income" ? "none" : "block";
+}
+
 function render() {
   setTheme();
+
   const income = state.transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const expenses = state.transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const expenses = state.transactions.filter(t => t.type !== "income").reduce((s, t) => s + t.amount, 0);
   const balance = income - expenses;
   const free = balance - (Number(state.goal.saved) || 0);
 
@@ -44,6 +51,7 @@ function render() {
   $("goalName").value = state.goal.name || "";
   $("goalTarget").value = state.goal.target || "";
   $("goalSaved").value = state.goal.saved || "";
+
   const notesBox = $("changeNotes");
   if (notesBox) notesBox.value = state.notes || "";
 
@@ -53,6 +61,7 @@ function render() {
 
   const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
   setActiveQuickAction(selectedType);
+  togglePaymentMethod();
 
   const list = $("transactionList");
   if (!state.transactions.length) {
@@ -60,12 +69,13 @@ function render() {
     list.textContent = "Sin movimientos todavía.";
     return;
   }
+
   list.className = "transaction-list";
   list.innerHTML = state.transactions.slice().reverse().map(t => `
     <div class="transaction-row">
       <div>
         <strong>${escapeHtml(t.description)}</strong>
-        <small>${escapeHtml(t.category)} · ${new Date(t.date).toLocaleDateString("es-MX")}</small>
+        <small>${escapeHtml(t.category)} · ${t.paymentMethod ? (t.paymentMethod === "cash" ? "Efectivo" : "Tarjeta") + ' · ' : ''}${new Date(t.date).toLocaleDateString("es-MX")}</small>
       </div>
       <div class="${t.type === "income" ? "amount-income" : "amount-expense"}">${t.type === "income" ? "+" : "−"}${money(t.amount)}</div>
     </div>
@@ -87,28 +97,52 @@ function addTransaction(type = null) {
   const amount = Number($("amount").value);
   const description = $("description").value.trim();
   const category = $("category").value;
+  const paymentMethod = selectedType === "income" ? null : $("paymentMethod").value;
+
   if (!description || !amount || amount <= 0) return;
-  state.transactions.push({ id: crypto.randomUUID(), type: selectedType, amount, description, category, date: new Date().toISOString() });
+
+  state.transactions.push({
+    id: crypto.randomUUID(),
+    type: selectedType,
+    amount,
+    description,
+    category,
+    paymentMethod,
+    date: new Date().toISOString()
+  });
+
   save();
   $("transactionForm").reset();
   $("typeIncome").checked = true;
   render();
 }
 
-$("transactionForm").addEventListener("submit", (e) => { e.preventDefault(); addTransaction(); });
+$("transactionForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  addTransaction();
+});
 
 document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.dataset.type;
-    document.querySelector(`#type${type === "income" ? "Income" : "Expense"}`).checked = true;
+
+    if (type === "income") document.querySelector(`#typeIncome`).checked = true;
+    if (type === "expense") document.querySelector(`#typeExpense`).checked = true;
+    if (type === "withdrawal") document.querySelector(`#typeWithdrawal`).checked = true;
+
     setActiveQuickAction(type);
+    togglePaymentMethod();
+
     $("movementPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
     setTimeout(() => $("description").focus(), 250);
   });
 });
 
 document.querySelectorAll('input[name="type"]').forEach(input => {
-  input.addEventListener("change", () => setActiveQuickAction(input.value));
+  input.addEventListener("change", () => {
+    setActiveQuickAction(input.value);
+    togglePaymentMethod();
+  });
 });
 
 $("saveGoal").addEventListener("click", () => {
@@ -117,6 +151,7 @@ $("saveGoal").addEventListener("click", () => {
     target: Number($("goalTarget").value) || 0,
     saved: Number($("goalSaved").value) || 0
   };
+
   save();
   render();
 });
@@ -146,7 +181,7 @@ $("clearBtn").addEventListener("click", () => {
 });
 
 $("exportBtn").addEventListener("click", () => {
-  const rows = [["date", "type", "description", "category", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.amount])];
+  const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.paymentMethod || '', t.amount])];
   const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
