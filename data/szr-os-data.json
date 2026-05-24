@@ -1,8 +1,27 @@
 {
-  "updatedAt": "2026-05-24T18:54:50.088Z",
+  "updatedAt": "2026-05-24T18:58:56.461Z",
   "app": "SZR OS",
   "data": {
-    "transactions": [],
+    "transactions": [
+      {
+        "id": "845eab32-395f-4988-9288-8be7f750773e",
+        "type": "income",
+        "amount": 711,
+        "description": "Pago",
+        "category": "Trabajo",
+        "paymentMethod": null,
+        "date": "2026-05-24T18:55:21.740Z"
+      },
+      {
+        "id": "32ace33b-f7d0-4f49-88ad-5b154771b77e",
+        "type": "income",
+        "amount": 711,
+        "description": "Pago",
+        "category": "Trabajo",
+        "paymentMethod": null,
+        "date": "2026-05-24T18:55:42.974Z"
+      }
+    ],
     "tasks": [],
     "ideas": [],
     "daily": {
