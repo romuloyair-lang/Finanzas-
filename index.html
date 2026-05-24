@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SZR OS" />
   <title>SZR OS</title>
-  <link rel="manifest" href="manifest.json?v=20260524-11" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-11" />
-  <link rel="stylesheet" href="styles.css?v=20260524-11" />
+  <link rel="manifest" href="manifest.json?v=20260524-12" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-12" />
+  <link rel="stylesheet" href="styles.css?v=20260524-12" />
 </head>
 <body>
   <main class="phone-shell">
@@ -18,6 +18,14 @@
       <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill">SZR OS</span></div>
       <div class="hero-title"><div><p class="muted">Centro personal</p><h1 id="balanceAmount">$0.00</h1></div><button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button></div>
       <div class="mini-grid"><div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div><div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div><div><span>Libre</span><strong id="freeAmount">$0.00</strong></div></div>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Google Calendar</h2><span id="calendarStatus">Sin conectar</span></div>
+      <p class="helper-text">Pega una URL de Google Apps Script Calendar. Sirve para mandar recordatorios y eventos a tu Google Calendar.</p>
+      <label class="field"><span>URL de Apps Script Calendar</span><input id="calendarWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
+      <div class="two-col"><button type="button" id="saveCalendarConfig" class="secondary-button">Conectar Calendar</button><button type="button" id="sendRemindersToCalendar" class="secondary-button">Enviar recordatorios</button></div>
+      <form id="calendarEventForm"><label class="field"><span>Título</span><input id="calendarTitle" type="text" placeholder="Ej. revisar presupuesto" /></label><div class="two-col"><label class="field"><span>Fecha</span><input id="calendarDate" type="date" /></label><label class="field"><span>Hora</span><input id="calendarTime" type="time" value="20:00" /></label></div><label class="field"><span>Duración</span><select id="calendarDuration"><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option></select></label><button type="submit" class="primary-button">Crear evento</button></form>
     </section>
 
     <section class="panel glass">
@@ -35,27 +43,15 @@
       <div id="reminderList" class="transaction-list empty">Sin recordatorios todavía.</div>
     </section>
 
-    <section class="panel glass">
-      <div class="section-title"><h2>Sincronización GitHub</h2><span id="syncStatus">Local</span></div>
-      <p class="helper-text">Guarda tus datos en <strong>data/szr-os-data.json</strong>. El token se queda guardado solo en este navegador.</p>
-      <label class="field"><span>GitHub token</span><input id="githubToken" type="password" placeholder="Pega tu token de GitHub" autocomplete="off" /></label>
-      <div class="two-col"><button type="button" id="saveGithubConfig" class="secondary-button">Activar sync</button><button type="button" id="pullGithubData" class="secondary-button">Leer GitHub</button></div>
-    </section>
-
+    <section class="panel glass"><div class="section-title"><h2>Sincronización GitHub</h2><span id="syncStatus">Local</span></div><p class="helper-text">Guarda tus datos en <strong>data/szr-os-data.json</strong>. El token se queda guardado solo en este navegador.</p><label class="field"><span>GitHub token</span><input id="githubToken" type="password" placeholder="Pega tu token de GitHub" autocomplete="off" /></label><div class="two-col"><button type="button" id="saveGithubConfig" class="secondary-button">Activar sync</button><button type="button" id="pullGithubData" class="secondary-button">Leer GitHub</button></div></section>
     <section class="panel glass"><div class="section-title"><h2>Estado de hoy</h2><span id="dailyStatusLabel">Sin registro</span></div><div class="two-col"><label class="field"><span>Energía</span><select id="energyLevel"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></label><label class="field"><span>Estrés</span><select id="stressLevel"><option value="">Seleccionar</option><option>Bajo</option><option>Medio</option><option>Alto</option></select></label></div><label class="field"><span>Siguiente paso importante</span><input id="nextStep" type="text" placeholder="Ej. limpiar cocina, revisar presupuesto, estudiar I-CAR" /></label><button type="button" id="saveDailyStatus" class="secondary-button">Guardar estado</button></section>
-
     <section class="panel glass"><div class="section-title"><h2>Hoy</h2><span id="taskCountLabel">0 pendientes</span></div><form id="taskForm"><div class="two-col"><label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. laundry, cocina, llamada, estudio" /></label><label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Personal</option><option>Estudio</option><option>Contenido</option><option>Otro</option></select></label></div><button type="submit" class="primary-button">Agregar pendiente</button></form><div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div></section>
-
     <section class="quick-actions" aria-label="Acciones rápidas"><button type="button" data-type="income" class="action-card income active">+ Ingreso</button><button type="button" data-type="expense" class="action-card expense">− Gasto</button><button type="button" data-type="withdrawal" class="action-card withdrawal">Retiro</button><button type="button" id="exportBtn" class="action-card neutral">Exportar</button></section>
-
     <section class="panel glass" id="movementPanel"><div class="section-title"><h2>Finanzas</h2><span>Movimiento rápido</span></div><form id="transactionForm"><div class="segmented three-options"><input type="radio" name="type" id="typeIncome" value="income" checked /><label for="typeIncome">Ingreso</label><input type="radio" name="type" id="typeExpense" value="expense" /><label for="typeExpense">Gasto</label><input type="radio" name="type" id="typeWithdrawal" value="withdrawal" /><label for="typeWithdrawal">Retiro</label></div><label class="field"><span>Descripción</span><input id="description" type="text" placeholder="Ej. pago semanal, gasolina, herramienta" required /></label><div class="two-col"><label class="field"><span>Monto</span><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" required /></label><label class="field"><span>Categoría</span><select id="category"><option>Trabajo</option><option>Casa</option><option>Comida</option><option>Gasolina</option><option>Herramientas</option><option>Vehículo</option><option>Taller / Negocio</option><option>Viajes</option><option>Ahorro</option><option>Retiro de efectivo</option><option>Otro</option></select></label></div><label class="field" id="paymentMethodField"><span>Forma de pago</span><select id="paymentMethod"><option value="cash">Efectivo</option><option value="card">Tarjeta</option></select></label><button class="primary-button" type="submit">Guardar movimiento</button></form></section>
-
     <section class="panel glass"><div class="section-title"><h2>Metas</h2><span id="goalProgressLabel">0%</span></div><div class="goal-card"><div class="progress"><span id="goalBar"></span></div><div class="goal-inputs"><input id="goalName" placeholder="Nombre de meta" /><input id="goalTarget" type="number" inputmode="decimal" placeholder="Meta $" /><input id="goalSaved" type="number" inputmode="decimal" placeholder="Ahorrado $" /></div><button type="button" id="saveGoal" class="secondary-button">Actualizar meta</button></div></section>
-
     <section class="panel glass"><div class="section-title"><h2>Ideas rápidas</h2><span id="ideaCountLabel">0 ideas</span></div><form id="ideaForm"><label class="field"><span>Idea</span><input id="ideaText" type="text" placeholder="Ej. video, herramienta, taller, casa, compra futura" /></label><button type="submit" class="secondary-button">Guardar idea</button></form><div id="ideaList" class="transaction-list empty">Sin ideas todavía.</div></section>
-
     <section class="panel glass bottom-panel"><div class="section-title"><h2>Movimientos</h2><button type="button" id="clearBtn" class="text-button">Limpiar</button></div><div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div></section>
   </main>
-  <script src="app.js?v=20260524-11"></script>
+  <script src="app.js?v=20260524-12"></script>
 </body>
 </html>
