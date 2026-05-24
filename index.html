@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SZR OS" />
   <title>SZR OS</title>
-  <link rel="manifest" href="manifest.json?v=20260524-9" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-9" />
-  <link rel="stylesheet" href="styles.css?v=20260524-9" />
+  <link rel="manifest" href="manifest.json?v=20260524-10" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-10" />
+  <link rel="stylesheet" href="styles.css?v=20260524-10" />
 </head>
 <body>
   <main class="phone-shell">
@@ -31,6 +31,24 @@
         <div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div>
         <div><span>Libre</span><strong id="freeAmount">$0.00</strong></div>
       </div>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Recordatorios</h2><span id="notificationStatus">Sin activar</span></div>
+      <p class="helper-text">Para iPhone: abre esta página en Safari, compártela y usa “Agregar a pantalla de inicio”. Después abre el icono instalado y activa notificaciones.</p>
+      <div class="two-col">
+        <button type="button" id="enableNotifications" class="secondary-button">Activar notificaciones</button>
+        <button type="button" id="testNotification" class="secondary-button">Probar aviso</button>
+      </div>
+      <form id="reminderForm">
+        <div class="two-col">
+          <label class="field"><span>Recordatorio</span><input id="reminderText" type="text" placeholder="Ej. registrar gastos" /></label>
+          <label class="field"><span>Hora</span><input id="reminderTime" type="time" value="20:00" /></label>
+        </div>
+        <label class="field"><span>Frecuencia</span><select id="reminderFrequency"><option value="daily">Diario</option><option value="weekdays">Lunes a viernes</option><option value="weekly">Semanal</option><option value="once">Una vez</option></select></label>
+        <button type="submit" class="primary-button">Agregar recordatorio</button>
+      </form>
+      <div id="reminderList" class="transaction-list empty">Sin recordatorios todavía.</div>
     </section>
 
     <section class="panel glass">
@@ -120,6 +138,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-9"></script>
+  <script src="app.js?v=20260524-10"></script>
 </body>
 </html>
