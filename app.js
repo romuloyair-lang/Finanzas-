@@ -3,8 +3,13 @@ const STORAGE_KEY = "szr-finance-v2";
 const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   transactions: [],
   goal: { name: "", target: 0, saved: 0 },
-  theme: "dark"
+  theme: "dark",
+  notes: ""
 };
+
+if (!Object.prototype.hasOwnProperty.call(state, "notes")) {
+  state.notes = "";
+}
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n) || 0);
@@ -39,6 +44,9 @@ function render() {
   $("goalName").value = state.goal.name || "";
   $("goalTarget").value = state.goal.target || "";
   $("goalSaved").value = state.goal.saved || "";
+  const notesBox = $("changeNotes");
+  if (notesBox) notesBox.value = state.notes || "";
+
   const pct = state.goal.target > 0 ? Math.min(100, Math.round((state.goal.saved / state.goal.target) * 100)) : 0;
   $("goalBar").style.width = `${pct}%`;
   $("goalProgressLabel").textContent = `${pct}%`;
@@ -112,6 +120,16 @@ $("saveGoal").addEventListener("click", () => {
   save();
   render();
 });
+
+const saveChangeNotesButton = $("saveChangeNotes");
+if (saveChangeNotesButton) {
+  saveChangeNotesButton.addEventListener("click", () => {
+    state.notes = $("changeNotes").value.trim();
+    save();
+    saveChangeNotesButton.textContent = "Notas guardadas";
+    setTimeout(() => saveChangeNotesButton.textContent = "Guardar notas", 1400);
+  });
+}
 
 $("themeToggle").addEventListener("click", () => {
   state.theme = state.theme === "dark" ? "light" : "dark";
