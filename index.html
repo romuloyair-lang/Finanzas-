@@ -6,18 +6,25 @@
   <meta name="theme-color" content="#0b0f17" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Finanzas SZR" />
-  <title>Finanzas SZR</title>
-  <link rel="manifest" href="manifest.json?v=20260524-14" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-14" />
-  <link rel="stylesheet" href="styles.css?v=20260524-14" />
+  <meta name="apple-mobile-web-app-title" content="Yair OS" />
+  <title>Yair OS</title>
+  <link rel="manifest" href="manifest.json?v=20260524-20" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-20" />
+  <link rel="stylesheet" href="styles.css?v=20260524-20" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="hero-card glass">
-      <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill">Finanzas</span></div>
-      <div class="hero-title"><div><p class="muted">Balance actual</p><h1 id="balanceAmount">$0.00</h1></div><button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button></div>
-      <div class="mini-grid"><div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div><div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div><div><span>Libre</span><strong id="freeAmount">$0.00</strong></div></div>
+      <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill" id="syncStatus">Local</span></div>
+      <div class="hero-title">
+        <div><p class="muted">Balance actual</p><h1 id="balanceAmount">$0.00</h1></div>
+        <button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button>
+      </div>
+      <div class="mini-grid">
+        <div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div>
+        <div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div>
+        <div><span>Libre</span><strong id="freeAmount">$0.00</strong></div>
+      </div>
     </section>
 
     <section class="quick-actions" aria-label="Acciones rápidas">
@@ -30,12 +37,57 @@
     <section class="panel glass" id="movementPanel">
       <div class="section-title"><h2>Finanzas</h2><span>Movimiento rápido</span></div>
       <form id="transactionForm">
-        <div class="segmented three-options"><input type="radio" name="type" id="typeIncome" value="income" checked /><label for="typeIncome">Ingreso</label><input type="radio" name="type" id="typeExpense" value="expense" /><label for="typeExpense">Gasto</label><input type="radio" name="type" id="typeWithdrawal" value="withdrawal" /><label for="typeWithdrawal">Retiro</label></div>
+        <div class="segmented three-options">
+          <input type="radio" name="type" id="typeIncome" value="income" checked /><label for="typeIncome">Ingreso</label>
+          <input type="radio" name="type" id="typeExpense" value="expense" /><label for="typeExpense">Gasto</label>
+          <input type="radio" name="type" id="typeWithdrawal" value="withdrawal" /><label for="typeWithdrawal">Retiro</label>
+        </div>
         <label class="field"><span>Descripción</span><input id="description" type="text" placeholder="Ej. pago semanal, gasolina, herramienta" required /></label>
         <div class="two-col"><label class="field"><span>Monto</span><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" required /></label><label class="field"><span>Categoría</span><select id="category"><option>Trabajo</option><option>Casa</option><option>Comida</option><option>Gasolina</option><option>Herramientas</option><option>Vehículo</option><option>Taller / Negocio</option><option>Viajes</option><option>Ahorro</option><option>Retiro de efectivo</option><option>Otro</option></select></label></div>
-        <label class="field" id="paymentMethodField"><span>Forma de pago</span><select id="paymentMethod"><option value="cash">Efectivo</option><option value="card">Tarjeta</option></select></label>
+        <label class="field" id="paymentMethodField"><span>Forma de pago</span><select id="paymentMethod"><option value="cash">Efectivo</option><option value="card">Tarjeta</option><option value="credit">Tarjeta de crédito</option><option value="debit">Débito</option><option value="transfer">Transferencia</option></select></label>
         <button class="primary-button" type="submit">Guardar movimiento</button>
       </form>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Memoria GPT</h2><span>Contexto persistente</span></div>
+      <form id="memoryForm">
+        <label class="field"><span>Categoría</span><select id="memoryCategory"><option>Finanzas</option><option>Casa</option><option>Vehículos</option><option>Trabajo</option><option>Contenido</option><option>Proyectos</option><option>Personal</option></select></label>
+        <label class="field"><span>Dato importante</span><textarea id="memoryText" placeholder="Ej. Mi prioridad de este mes es organizar finanzas y bajar gastos." required></textarea></label>
+        <button class="secondary-button" type="submit">Guardar en memoria</button>
+      </form>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Agenda</h2><span id="taskCountLabel">0 pendientes</span></div>
+      <form id="taskForm">
+        <label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. lavar camioneta, pagar UFCU" required /></label>
+        <div class="two-col"><label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Vehículo</option><option>Finanzas</option><option>Contenido</option><option>Personal</option></select></label><label class="field"><span>Fecha objetivo</span><input id="taskDate" type="date" /></label></div>
+        <button class="secondary-button" type="submit">Guardar pendiente</button>
+      </form>
+      <div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Asistente IA</h2><span>OpenAI vía proxy</span></div>
+      <label class="field"><span>Pregunta para tu sistema</span><textarea id="aiPrompt" placeholder="Ej. analiza mis gastos y dime qué debo hacer esta semana"></textarea></label>
+      <button class="primary-button" id="askAiBtn" type="button">Preguntar a GPT</button>
+      <div id="aiAnswer" class="ai-answer empty">Configura un proxy OpenAI para usar esta función.</div>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Integraciones</h2><span>GitHub · Google · OpenAI</span></div>
+      <label class="field"><span>GitHub token local</span><input id="githubToken" type="password" placeholder="Token con Contents: read/write" /></label>
+      <button class="secondary-button" id="saveGithubConfig" type="button">Activar sync GitHub</button>
+      <button class="ghost-button" id="pullGithubData" type="button">Leer datos desde GitHub</button>
+
+      <label class="field"><span>Google Apps Script Web App URL</span><input id="googleScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
+      <button class="secondary-button" id="saveGoogleConfig" type="button">Guardar conexión Google</button>
+      <p class="helper-text">Google Apps Script escribe en Sheets, puede crear eventos en Calendar y usar Gmail cuando autorices el script.</p>
+
+      <label class="field"><span>OpenAI proxy URL</span><input id="openAiProxyUrl" type="url" placeholder="https://tu-backend.vercel.app/api/openai" /></label>
+      <button class="secondary-button" id="saveOpenAiConfig" type="button">Guardar conexión OpenAI</button>
+      <p class="helper-text">No pongas tu API key de OpenAI en esta página pública. Usa el proxy incluido en este repositorio.</p>
     </section>
 
     <section class="panel glass bottom-panel">
@@ -43,6 +95,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-14"></script>
+  <script src="app.js?v=20260524-20"></script>
 </body>
 </html>
