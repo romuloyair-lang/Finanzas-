@@ -1,0 +1,31 @@
+{
+  "updatedAt": "2026-05-24T18:47:34.656Z",
+  "app": "SZR OS",
+  "data": {
+    "transactions": [
+      {
+        "id": "032a0634-9810-4bca-84fe-e0ed0d7ea4da",
+        "type": "income",
+        "amount": 10,
+        "description": "10",
+        "category": "Trabajo",
+        "paymentMethod": null,
+        "date": "2026-05-24T18:12:14.130Z"
+      }
+    ],
+    "tasks": [],
+    "ideas": [],
+    "daily": {
+      "date": "",
+      "energy": "",
+      "stress": "",
+      "nextStep": ""
+    },
+    "goal": {
+      "name": "",
+      "target": 0,
+      "saved": 0
+    },
+    "theme": "dark"
+  }
+}
