@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Finanzas SZR" />
   <title>Finanzas SZR</title>
-  <link rel="manifest" href="manifest.json?v=20260524-6" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-6" />
-  <link rel="stylesheet" href="styles.css?v=20260524-6" />
+  <link rel="manifest" href="manifest.json?v=20260524-7" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-7" />
+  <link rel="stylesheet" href="styles.css?v=20260524-7" />
 </head>
 <body>
   <main class="phone-shell">
@@ -61,42 +61,6 @@
       </form>
     </section>
 
-    <section class="panel glass" id="payrollPanel">
-      <div class="section-title"><h2>Nómina</h2><span id="payrollCountLabel">0 registros</span></div>
-      <div class="goal-card">
-        <label class="field"><span>Subir foto o PDF de referencia</span><input id="paystubFile" type="file" accept="image/*,.pdf" /></label>
-        <div class="two-col">
-          <label class="field"><span>Fecha de pago</span><input id="payDate" type="date" /></label>
-          <label class="field"><span>Periodo</span><input id="payPeriod" type="text" placeholder="05/10/2026 - 05/16/2026" /></label>
-        </div>
-        <div class="two-col">
-          <label class="field"><span>Horas</span><input id="payHours" type="number" inputmode="decimal" min="0" step="0.01" placeholder="40.00" /></label>
-          <label class="field"><span>Tarifa $/hr</span><input id="payRate" type="number" inputmode="decimal" min="0" step="0.01" placeholder="22.00" /></label>
-        </div>
-        <div class="two-col">
-          <label class="field"><span>Bruto $</span><input id="grossPay" type="number" inputmode="decimal" min="0" step="0.01" placeholder="880.00" /></label>
-          <label class="field"><span>Neto $</span><input id="netPay" type="number" inputmode="decimal" min="0" step="0.01" placeholder="711.60" /></label>
-        </div>
-        <div class="two-col">
-          <label class="field"><span>Impuestos $</span><input id="taxesPay" type="number" inputmode="decimal" min="0" step="0.01" placeholder="168.40" /></label>
-          <label class="field"><span>Deducciones $</span><input id="deductionsPay" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></label>
-        </div>
-        <label class="field"><span>Notas</span><textarea id="payrollNotes" rows="3" placeholder="Pega aquí los datos que GPT extraiga del paystub."></textarea></label>
-        <button type="button" id="savePayroll" class="secondary-button">Guardar nómina y registrar ingreso</button>
-      </div>
-      <div id="payrollList" class="transaction-list empty">Sin nóminas todavía.</div>
-    </section>
-
-    <section class="panel glass" id="notesPanel">
-      <div class="section-title"><h2>Notas de cambios</h2><span>Texto para copiar</span></div>
-      <label class="field">
-        <span>Escribe ideas o cambios que quieres hacer en esta app</span>
-        <textarea id="changeNotes" rows="6" placeholder="Ej. Agregar presupuesto mensual, categorías editables y una gráfica de gastos."></textarea>
-      </label>
-      <button type="button" id="saveChangeNotes" class="secondary-button">Guardar notas</button>
-      <p class="helper-text">Estas notas se guardan solo en este navegador. Puedes copiarlas y pegarlas en el chat cuando pidas cambios.</p>
-    </section>
-
     <section class="panel glass">
       <div class="section-title"><h2>Metas</h2><span id="goalProgressLabel">0%</span></div>
       <div class="goal-card">
@@ -115,6 +79,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-6"></script>
+  <script src="app.js?v=20260524-7"></script>
 </body>
 </html>
