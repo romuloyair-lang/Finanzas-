@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Finanzas SZR" />
   <title>Finanzas SZR</title>
-  <link rel="manifest" href="manifest.json?v=20260524-3" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-3" />
-  <link rel="stylesheet" href="styles.css?v=20260524-3" />
+  <link rel="manifest" href="manifest.json?v=20260524-5" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-5" />
+  <link rel="stylesheet" href="styles.css?v=20260524-5" />
 </head>
 <body>
   <main class="phone-shell">
@@ -36,23 +36,27 @@
     <section class="quick-actions" aria-label="Acciones rápidas">
       <button type="button" data-type="income" class="action-card income active">+ Ingreso</button>
       <button type="button" data-type="expense" class="action-card expense">− Gasto</button>
+      <button type="button" data-type="withdrawal" class="action-card withdrawal">Retiro</button>
       <button type="button" id="exportBtn" class="action-card neutral">Exportar</button>
     </section>
 
     <section class="panel glass" id="movementPanel">
       <div class="section-title"><h2>Nuevo movimiento</h2><span>iPhone ready</span></div>
       <form id="transactionForm">
-        <div class="segmented">
+        <div class="segmented three-options">
           <input type="radio" name="type" id="typeIncome" value="income" checked />
           <label for="typeIncome">Ingreso</label>
           <input type="radio" name="type" id="typeExpense" value="expense" />
           <label for="typeExpense">Gasto</label>
+          <input type="radio" name="type" id="typeWithdrawal" value="withdrawal" />
+          <label for="typeWithdrawal">Retiro</label>
         </div>
         <label class="field"><span>Descripción</span><input id="description" type="text" placeholder="Ej. Pago semanal, gasolina, herramienta" required /></label>
         <div class="two-col">
           <label class="field"><span>Monto</span><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" required /></label>
-          <label class="field"><span>Categoría</span><select id="category"><option>Trabajo</option><option>Casa</option><option>Comida</option><option>Gasolina</option><option>Herramientas</option><option>Vehículo</option><option>Taller / Negocio</option><option>Viajes</option><option>Ahorro</option><option>Otro</option></select></label>
+          <label class="field"><span>Categoría</span><select id="category"><option>Trabajo</option><option>Casa</option><option>Comida</option><option>Gasolina</option><option>Herramientas</option><option>Vehículo</option><option>Taller / Negocio</option><option>Viajes</option><option>Ahorro</option><option>Retiro de efectivo</option><option>Otro</option></select></label>
         </div>
+        <label class="field" id="paymentMethodField"><span>Forma de pago</span><select id="paymentMethod"><option value="cash">Efectivo</option><option value="card">Tarjeta</option></select></label>
         <button class="primary-button" type="submit">Guardar movimiento</button>
       </form>
     </section>
@@ -70,7 +74,6 @@
     <section class="panel glass">
       <div class="section-title"><h2>Metas</h2><span id="goalProgressLabel">0%</span></div>
       <div class="goal-card">
-        <div><strong>Fondo / Proyecto principal</strong><p>Define una meta para Tacoma, herramientas, ADAS o taller.</p></div>
         <div class="progress"><span id="goalBar"></span></div>
         <div class="goal-inputs">
           <input id="goalName" placeholder="Nombre de meta" />
@@ -86,6 +89,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-3"></script>
+  <script src="app.js?v=20260524-5"></script>
 </body>
 </html>
