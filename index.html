@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SZR OS" />
   <title>SZR OS</title>
-  <link rel="manifest" href="manifest.json?v=20260524-8" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-8" />
-  <link rel="stylesheet" href="styles.css?v=20260524-8" />
+  <link rel="manifest" href="manifest.json?v=20260524-9" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-9" />
+  <link rel="stylesheet" href="styles.css?v=20260524-9" />
 </head>
 <body>
   <main class="phone-shell">
@@ -30,6 +30,16 @@
         <div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div>
         <div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div>
         <div><span>Libre</span><strong id="freeAmount">$0.00</strong></div>
+      </div>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Sincronización GitHub</h2><span id="syncStatus">Local</span></div>
+      <p class="helper-text">Guarda tus datos en <strong>data/szr-os-data.json</strong>. El token se queda guardado solo en este navegador.</p>
+      <label class="field"><span>GitHub token</span><input id="githubToken" type="password" placeholder="Pega tu token de GitHub" autocomplete="off" /></label>
+      <div class="two-col">
+        <button type="button" id="saveGithubConfig" class="secondary-button">Activar sync</button>
+        <button type="button" id="pullGithubData" class="secondary-button">Leer GitHub</button>
       </div>
     </section>
 
@@ -110,6 +120,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-8"></script>
+  <script src="app.js?v=20260524-9"></script>
 </body>
 </html>
