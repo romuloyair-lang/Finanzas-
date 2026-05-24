@@ -8,41 +8,30 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="SZR OS" />
   <title>SZR OS</title>
-  <link rel="manifest" href="manifest.json?v=20260524-12" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-12" />
-  <link rel="stylesheet" href="styles.css?v=20260524-12" />
+  <link rel="manifest" href="manifest.json?v=20260524-13" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-13" />
+  <link rel="stylesheet" href="styles.css?v=20260524-13" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="hero-card glass">
-      <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill">SZR OS</span></div>
-      <div class="hero-title"><div><p class="muted">Centro personal</p><h1 id="balanceAmount">$0.00</h1></div><button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button></div>
+      <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill">SZR OS + IA</span></div>
+      <div class="hero-title"><div><p class="muted">Centro personal inteligente</p><h1 id="balanceAmount">$0.00</h1></div><button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button></div>
       <div class="mini-grid"><div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div><div><span>Gastos</span><strong id="expenseAmount">$0.00</strong></div><div><span>Libre</span><strong id="freeAmount">$0.00</strong></div></div>
     </section>
 
-    <section class="panel glass">
-      <div class="section-title"><h2>Google Calendar</h2><span id="calendarStatus">Sin conectar</span></div>
-      <p class="helper-text">Pega una URL de Google Apps Script Calendar. Sirve para mandar recordatorios y eventos a tu Google Calendar.</p>
-      <label class="field"><span>URL de Apps Script Calendar</span><input id="calendarWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
-      <div class="two-col"><button type="button" id="saveCalendarConfig" class="secondary-button">Conectar Calendar</button><button type="button" id="sendRemindersToCalendar" class="secondary-button">Enviar recordatorios</button></div>
-      <form id="calendarEventForm"><label class="field"><span>Título</span><input id="calendarTitle" type="text" placeholder="Ej. revisar presupuesto" /></label><div class="two-col"><label class="field"><span>Fecha</span><input id="calendarDate" type="date" /></label><label class="field"><span>Hora</span><input id="calendarTime" type="time" value="20:00" /></label></div><label class="field"><span>Duración</span><select id="calendarDuration"><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option></select></label><button type="submit" class="primary-button">Crear evento</button></form>
+    <section class="panel glass ai-panel">
+      <div class="section-title"><h2>Centro IA</h2><span id="aiStatus">Listo</span></div>
+      <p class="helper-text">Genera un resumen compacto para pegar en ChatGPT o guardarlo en GitHub. La IA podrá leer balance, gastos, tareas, metas, recordatorios e ideas.</p>
+      <div class="mini-grid"><div><span>Datos IA</span><strong id="aiDataCount">0 items</strong></div><div><span>Riesgo</span><strong id="aiRiskLabel">Normal</strong></div><div><span>Acción</span><strong id="aiNextAction">Registrar</strong></div></div>
+      <label class="field"><span>Nota para IA</span><textarea id="aiNote" placeholder="Ej. Esta semana quiero ahorrar más, revisar gastos de gasolina o preparar compra de camioneta."></textarea></label>
+      <div class="two-col"><button type="button" id="generateAiContext" class="primary-button">Preparar contexto IA</button><button type="button" id="copyAiContext" class="secondary-button">Copiar para ChatGPT</button></div>
+      <label class="field"><span>Contexto generado</span><textarea id="aiContextOutput" readonly placeholder="Aquí aparecerá el resumen para ChatGPT."></textarea></label>
     </section>
 
-    <section class="panel glass">
-      <div class="section-title"><h2>Google Sheets</h2><span id="sheetsStatus">Sin conectar</span></div>
-      <p class="helper-text">Pega aquí la URL de una Google Apps Script Web App. Cada movimiento nuevo se enviará a Google Sheets.</p>
-      <label class="field"><span>URL de Apps Script</span><input id="sheetsWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
-      <div class="two-col"><button type="button" id="saveSheetsConfig" class="secondary-button">Conectar Sheets</button><button type="button" id="syncSheetsNow" class="secondary-button">Enviar todo</button></div>
-    </section>
-
-    <section class="panel glass">
-      <div class="section-title"><h2>Recordatorios</h2><span id="notificationStatus">Sin activar</span></div>
-      <p class="helper-text">Para iPhone: abre esta página en Safari, compártela y usa “Agregar a pantalla de inicio”. Después abre el icono instalado y activa notificaciones.</p>
-      <div class="two-col"><button type="button" id="enableNotifications" class="secondary-button">Activar notificaciones</button><button type="button" id="testNotification" class="secondary-button">Probar aviso</button></div>
-      <form id="reminderForm"><div class="two-col"><label class="field"><span>Recordatorio</span><input id="reminderText" type="text" placeholder="Ej. registrar gastos" /></label><label class="field"><span>Hora</span><input id="reminderTime" type="time" value="20:00" /></label></div><label class="field"><span>Frecuencia</span><select id="reminderFrequency"><option value="daily">Diario</option><option value="weekdays">Lunes a viernes</option><option value="weekly">Semanal</option><option value="once">Una vez</option></select></label><button type="submit" class="primary-button">Agregar recordatorio</button></form>
-      <div id="reminderList" class="transaction-list empty">Sin recordatorios todavía.</div>
-    </section>
-
+    <section class="panel glass"><div class="section-title"><h2>Google Calendar</h2><span id="calendarStatus">Sin conectar</span></div><p class="helper-text">Pega una URL de Google Apps Script Calendar. Sirve para mandar recordatorios y eventos a tu Google Calendar.</p><label class="field"><span>URL de Apps Script Calendar</span><input id="calendarWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label><div class="two-col"><button type="button" id="saveCalendarConfig" class="secondary-button">Conectar Calendar</button><button type="button" id="sendRemindersToCalendar" class="secondary-button">Enviar recordatorios</button></div><form id="calendarEventForm"><label class="field"><span>Título</span><input id="calendarTitle" type="text" placeholder="Ej. revisar presupuesto" /></label><div class="two-col"><label class="field"><span>Fecha</span><input id="calendarDate" type="date" /></label><label class="field"><span>Hora</span><input id="calendarTime" type="time" value="20:00" /></label></div><label class="field"><span>Duración</span><select id="calendarDuration"><option value="15">15 min</option><option value="30">30 min</option><option value="60">1 hora</option></select></label><button type="submit" class="primary-button">Crear evento</button></form></section>
+    <section class="panel glass"><div class="section-title"><h2>Google Sheets</h2><span id="sheetsStatus">Sin conectar</span></div><p class="helper-text">Pega aquí la URL de una Google Apps Script Web App. Cada movimiento nuevo se enviará a Google Sheets.</p><label class="field"><span>URL de Apps Script</span><input id="sheetsWebhookUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label><div class="two-col"><button type="button" id="saveSheetsConfig" class="secondary-button">Conectar Sheets</button><button type="button" id="syncSheetsNow" class="secondary-button">Enviar todo</button></div></section>
+    <section class="panel glass"><div class="section-title"><h2>Recordatorios</h2><span id="notificationStatus">Sin activar</span></div><p class="helper-text">Para iPhone: abre esta página en Safari, compártela y usa “Agregar a pantalla de inicio”. Después abre el icono instalado y activa notificaciones.</p><div class="two-col"><button type="button" id="enableNotifications" class="secondary-button">Activar notificaciones</button><button type="button" id="testNotification" class="secondary-button">Probar aviso</button></div><form id="reminderForm"><div class="two-col"><label class="field"><span>Recordatorio</span><input id="reminderText" type="text" placeholder="Ej. registrar gastos" /></label><label class="field"><span>Hora</span><input id="reminderTime" type="time" value="20:00" /></label></div><label class="field"><span>Frecuencia</span><select id="reminderFrequency"><option value="daily">Diario</option><option value="weekdays">Lunes a viernes</option><option value="weekly">Semanal</option><option value="once">Una vez</option></select></label><button type="submit" class="primary-button">Agregar recordatorio</button></form><div id="reminderList" class="transaction-list empty">Sin recordatorios todavía.</div></section>
     <section class="panel glass"><div class="section-title"><h2>Sincronización GitHub</h2><span id="syncStatus">Local</span></div><p class="helper-text">Guarda tus datos en <strong>data/szr-os-data.json</strong>. El token se queda guardado solo en este navegador.</p><label class="field"><span>GitHub token</span><input id="githubToken" type="password" placeholder="Pega tu token de GitHub" autocomplete="off" /></label><div class="two-col"><button type="button" id="saveGithubConfig" class="secondary-button">Activar sync</button><button type="button" id="pullGithubData" class="secondary-button">Leer GitHub</button></div></section>
     <section class="panel glass"><div class="section-title"><h2>Estado de hoy</h2><span id="dailyStatusLabel">Sin registro</span></div><div class="two-col"><label class="field"><span>Energía</span><select id="energyLevel"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></label><label class="field"><span>Estrés</span><select id="stressLevel"><option value="">Seleccionar</option><option>Bajo</option><option>Medio</option><option>Alto</option></select></label></div><label class="field"><span>Siguiente paso importante</span><input id="nextStep" type="text" placeholder="Ej. limpiar cocina, revisar presupuesto, estudiar I-CAR" /></label><button type="button" id="saveDailyStatus" class="secondary-button">Guardar estado</button></section>
     <section class="panel glass"><div class="section-title"><h2>Hoy</h2><span id="taskCountLabel">0 pendientes</span></div><form id="taskForm"><div class="two-col"><label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. laundry, cocina, llamada, estudio" /></label><label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Personal</option><option>Estudio</option><option>Contenido</option><option>Otro</option></select></label></div><button type="submit" class="primary-button">Agregar pendiente</button></form><div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div></section>
@@ -52,6 +41,6 @@
     <section class="panel glass"><div class="section-title"><h2>Ideas rápidas</h2><span id="ideaCountLabel">0 ideas</span></div><form id="ideaForm"><label class="field"><span>Idea</span><input id="ideaText" type="text" placeholder="Ej. video, herramienta, taller, casa, compra futura" /></label><button type="submit" class="secondary-button">Guardar idea</button></form><div id="ideaList" class="transaction-list empty">Sin ideas todavía.</div></section>
     <section class="panel glass bottom-panel"><div class="section-title"><h2>Movimientos</h2><button type="button" id="clearBtn" class="text-button">Limpiar</button></div><div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div></section>
   </main>
-  <script src="app.js?v=20260524-12"></script>
+  <script src="app.js?v=20260524-13"></script>
 </body>
 </html>
