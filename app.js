@@ -2,14 +2,14 @@ const STORAGE_KEY = "szr-finance-v2";
 
 const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   transactions: [],
+  payrolls: [],
   goal: { name: "", target: 0, saved: 0 },
   theme: "dark",
   notes: ""
 };
 
-if (!Object.prototype.hasOwnProperty.call(state, "notes")) {
-  state.notes = "";
-}
+if (!Object.prototype.hasOwnProperty.call(state, "notes")) state.notes = "";
+if (!Object.prototype.hasOwnProperty.call(state, "payrolls")) state.payrolls = [];
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n) || 0);
@@ -30,8 +30,29 @@ function setActiveQuickAction(type) {
 
 function togglePaymentMethod() {
   const type = document.querySelector('input[name="type"]:checked')?.value;
-  const field = $("paymentMethodField");
-  field.style.display = type === "expense" ? "block" : "none";
+  $("paymentMethodField").style.display = type === "expense" ? "block" : "none";
+}
+
+function renderPayrolls() {
+  const payrollList = $("payrollList");
+  $("payrollCountLabel").textContent = `${state.payrolls.length} registros`;
+
+  if (!state.payrolls.length) {
+    payrollList.className = "transaction-list empty";
+    payrollList.textContent = "Sin nóminas todavía.";
+    return;
+  }
+
+  payrollList.className = "transaction-list";
+  payrollList.innerHTML = state.payrolls.slice().reverse().map(p => `
+    <div class="transaction-row">
+      <div>
+        <strong>${escapeHtml(p.period || 'Nómina semanal')}</strong>
+        <small>${p.payDate || ''} · ${money(p.net)} neto · ${p.hours || 0} hrs</small>
+      </div>
+      <div class="amount-income">+${money(p.net)}</div>
+    </div>
+  `).join('');
 }
 
 function render() {
@@ -62,6 +83,7 @@ function render() {
   const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
   setActiveQuickAction(selectedType);
   togglePaymentMethod();
+  renderPayrolls();
 
   const list = $("transactionList");
   if (!state.transactions.length) {
@@ -91,15 +113,22 @@ function render() {
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>'"]/g, c => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    "\"": "&quot;"
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
   }[c]));
 }
 
-function addTransaction(type = null) {
+function addTransaction(type = null, customData = null) {
+  if (customData) {
+    state.transactions.push(customData);
+    save();
+    render();
+    return;
+  }
+
   const selectedType = type || document.querySelector('input[name="type"]:checked').value;
   const amount = Number($("amount").value);
   const description = $("description").value.trim();
@@ -124,6 +153,51 @@ function addTransaction(type = null) {
   render();
 }
 
+$("savePayroll").addEventListener("click", () => {
+  const payroll = {
+    id: crypto.randomUUID(),
+    payDate: $("payDate").value,
+    period: $("payPeriod").value.trim(),
+    hours: Number($("payHours").value) || 0,
+    rate: Number($("payRate").value) || 0,
+    gross: Number($("grossPay").value) || 0,
+    net: Number($("netPay").value) || 0,
+    taxes: Number($("taxesPay").value) || 0,
+    deductions: Number($("deductionsPay").value) || 0,
+    notes: $("payrollNotes").value.trim(),
+    createdAt: new Date().toISOString()
+  };
+
+  if (!payroll.net || payroll.net <= 0) return;
+
+  state.payrolls.push(payroll);
+
+  addTransaction(null, {
+    id: crypto.randomUUID(),
+    type: 'income',
+    amount: payroll.net,
+    description: 'Nómina semanal',
+    category: 'Trabajo',
+    paymentMethod: null,
+    date: payroll.payDate || new Date().toISOString()
+  });
+
+  save();
+
+  $("payDate").value = '';
+  $("payPeriod").value = '';
+  $("payHours").value = '';
+  $("payRate").value = '';
+  $("grossPay").value = '';
+  $("netPay").value = '';
+  $("taxesPay").value = '';
+  $("deductionsPay").value = '';
+  $("payrollNotes").value = '';
+  $("paystubFile").value = '';
+
+  render();
+});
+
 $("transactionForm").addEventListener("submit", (e) => {
   e.preventDefault();
   addTransaction();
@@ -133,9 +207,9 @@ document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.dataset.type;
 
-    if (type === "income") document.querySelector(`#typeIncome`).checked = true;
-    if (type === "expense") document.querySelector(`#typeExpense`).checked = true;
-    if (type === "withdrawal") document.querySelector(`#typeWithdrawal`).checked = true;
+    if (type === "income") $("typeIncome").checked = true;
+    if (type === "expense") $("typeExpense").checked = true;
+    if (type === "withdrawal") $("typeWithdrawal").checked = true;
 
     setActiveQuickAction(type);
     togglePaymentMethod();
@@ -180,8 +254,9 @@ $("themeToggle").addEventListener("click", () => {
 });
 
 $("clearBtn").addEventListener("click", () => {
-  if (confirm("¿Borrar todos los movimientos?")) {
+  if (confirm("¿Borrar todos los movimientos y nóminas?")) {
     state.transactions = [];
+    state.payrolls = [];
     save();
     render();
   }
@@ -189,12 +264,12 @@ $("clearBtn").addEventListener("click", () => {
 
 $("exportBtn").addEventListener("click", () => {
   const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.paymentMethod || '', t.amount])];
-  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
+  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
-  a.download = "szr-finanzas.csv";
+  a.download = 'szr-finanzas.csv';
   a.click();
   URL.revokeObjectURL(url);
 });
