@@ -17,6 +17,12 @@ function setTheme() {
   document.body.classList.toggle("light", state.theme === "light");
 }
 
+function setActiveQuickAction(type) {
+  document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.type === type);
+  });
+}
+
 function render() {
   setTheme();
   const income = state.transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
@@ -36,6 +42,9 @@ function render() {
   const pct = state.goal.target > 0 ? Math.min(100, Math.round((state.goal.saved / state.goal.target) * 100)) : 0;
   $("goalBar").style.width = `${pct}%`;
   $("goalProgressLabel").textContent = `${pct}%`;
+
+  const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
+  setActiveQuickAction(selectedType);
 
   const list = $("transactionList");
   if (!state.transactions.length) {
@@ -84,8 +93,14 @@ document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
   btn.addEventListener("click", () => {
     const type = btn.dataset.type;
     document.querySelector(`#type${type === "income" ? "Income" : "Expense"}`).checked = true;
-    $("description").focus();
+    setActiveQuickAction(type);
+    $("movementPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setTimeout(() => $("description").focus(), 250);
   });
+});
+
+document.querySelectorAll('input[name="type"]').forEach(input => {
+  input.addEventListener("change", () => setActiveQuickAction(input.value));
 });
 
 $("saveGoal").addEventListener("click", () => {
