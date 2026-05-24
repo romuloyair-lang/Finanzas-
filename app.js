@@ -56,7 +56,13 @@ function render() {
 }
 
 function escapeHtml(str) {
-  return String(str).replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;":">":"&gt;","'":"&#39;","\"":"&quot;"}[c]));
+  return String(str).replace(/[&<>'"]/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    "\"": "&quot;"
+  }[c]));
 }
 
 function addTransaction(type = null) {
