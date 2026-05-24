@@ -1,15 +1,20 @@
-const STORAGE_KEY = "szr-finance-v2";
+const STORAGE_KEY = "szr-os-v1";
 
 const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   transactions: [],
-  payrolls: [],
+  tasks: [],
+  ideas: [],
+  daily: { date: "", energy: "", stress: "", nextStep: "" },
   goal: { name: "", target: 0, saved: 0 },
-  theme: "dark",
-  notes: ""
+  theme: "dark"
 };
 
-if (!Object.prototype.hasOwnProperty.call(state, "notes")) state.notes = "";
-if (!Object.prototype.hasOwnProperty.call(state, "payrolls")) state.payrolls = [];
+if (!Object.prototype.hasOwnProperty.call(state, "transactions")) state.transactions = [];
+if (!Object.prototype.hasOwnProperty.call(state, "tasks")) state.tasks = [];
+if (!Object.prototype.hasOwnProperty.call(state, "ideas")) state.ideas = [];
+if (!Object.prototype.hasOwnProperty.call(state, "daily")) state.daily = { date: "", energy: "", stress: "", nextStep: "" };
+if (!Object.prototype.hasOwnProperty.call(state, "goal")) state.goal = { name: "", target: 0, saved: 0 };
+if (!Object.prototype.hasOwnProperty.call(state, "theme")) state.theme = "dark";
 
 const $ = (id) => document.getElementById(id);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n) || 0);
@@ -30,29 +35,82 @@ function setActiveQuickAction(type) {
 
 function togglePaymentMethod() {
   const type = document.querySelector('input[name="type"]:checked')?.value;
-  $("paymentMethodField").style.display = type === "expense" ? "block" : "none";
+  const field = $("paymentMethodField");
+  if (field) field.style.display = type === "expense" ? "block" : "none";
 }
 
-function renderPayrolls() {
-  const payrollList = $("payrollList");
-  $("payrollCountLabel").textContent = `${state.payrolls.length} registros`;
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
 
-  if (!state.payrolls.length) {
-    payrollList.className = "transaction-list empty";
-    payrollList.textContent = "Sin nóminas todavía.";
+function renderDailyStatus() {
+  const today = todayKey();
+  const hasToday = state.daily.date === today;
+
+  $("energyLevel").value = hasToday ? state.daily.energy || "" : "";
+  $("stressLevel").value = hasToday ? state.daily.stress || "" : "";
+  $("nextStep").value = hasToday ? state.daily.nextStep || "" : "";
+
+  const label = $("dailyStatusLabel");
+  if (!hasToday || (!state.daily.energy && !state.daily.stress && !state.daily.nextStep)) {
+    label.textContent = "Sin registro";
+  } else {
+    label.textContent = "Guardado";
+  }
+}
+
+function renderTasks() {
+  const list = $("taskList");
+  const pendingTasks = state.tasks.filter(t => !t.done);
+  $("taskCountLabel").textContent = `${pendingTasks.length} pendientes`;
+
+  if (!state.tasks.length) {
+    list.className = "transaction-list empty";
+    list.textContent = "Sin pendientes todavía.";
     return;
   }
 
-  payrollList.className = "transaction-list";
-  payrollList.innerHTML = state.payrolls.slice().reverse().map(p => `
+  list.className = "transaction-list";
+  list.innerHTML = state.tasks.slice().reverse().map(t => `
     <div class="transaction-row">
       <div>
-        <strong>${escapeHtml(p.period || 'Nómina semanal')}</strong>
-        <small>${p.payDate || ''} · ${money(p.net)} neto · ${p.hours || 0} hrs</small>
+        <strong>${t.done ? "✓ " : ""}${escapeHtml(t.text)}</strong>
+        <small>${escapeHtml(t.area)} · ${new Date(t.date).toLocaleDateString("es-MX")}</small>
       </div>
-      <div class="amount-income">+${money(p.net)}</div>
+      <button type="button" class="text-button" data-task-id="${t.id}">${t.done ? "Reabrir" : "Hecho"}</button>
     </div>
-  `).join('');
+  `).join("");
+
+  document.querySelectorAll("[data-task-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const task = state.tasks.find(t => t.id === btn.dataset.taskId);
+      if (!task) return;
+      task.done = !task.done;
+      save();
+      render();
+    });
+  });
+}
+
+function renderIdeas() {
+  const list = $("ideaList");
+  $("ideaCountLabel").textContent = `${state.ideas.length} ideas`;
+
+  if (!state.ideas.length) {
+    list.className = "transaction-list empty";
+    list.textContent = "Sin ideas todavía.";
+    return;
+  }
+
+  list.className = "transaction-list";
+  list.innerHTML = state.ideas.slice().reverse().map(i => `
+    <div class="transaction-row">
+      <div>
+        <strong>${escapeHtml(i.text)}</strong>
+        <small>${new Date(i.date).toLocaleDateString("es-MX")}</small>
+      </div>
+    </div>
+  `).join("");
 }
 
 function render() {
@@ -73,9 +131,6 @@ function render() {
   $("goalTarget").value = state.goal.target || "";
   $("goalSaved").value = state.goal.saved || "";
 
-  const notesBox = $("changeNotes");
-  if (notesBox) notesBox.value = state.notes || "";
-
   const pct = state.goal.target > 0 ? Math.min(100, Math.round((state.goal.saved / state.goal.target) * 100)) : 0;
   $("goalBar").style.width = `${pct}%`;
   $("goalProgressLabel").textContent = `${pct}%`;
@@ -83,7 +138,9 @@ function render() {
   const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
   setActiveQuickAction(selectedType);
   togglePaymentMethod();
-  renderPayrolls();
+  renderDailyStatus();
+  renderTasks();
+  renderIdeas();
 
   const list = $("transactionList");
   if (!state.transactions.length) {
@@ -113,22 +170,15 @@ function render() {
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>'"]/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    "\"": "&quot;"
   }[c]));
 }
 
-function addTransaction(type = null, customData = null) {
-  if (customData) {
-    state.transactions.push(customData);
-    save();
-    render();
-    return;
-  }
-
+function addTransaction(type = null) {
   const selectedType = type || document.querySelector('input[name="type"]:checked').value;
   const amount = Number($("amount").value);
   const description = $("description").value.trim();
@@ -153,48 +203,48 @@ function addTransaction(type = null, customData = null) {
   render();
 }
 
-$("savePayroll").addEventListener("click", () => {
-  const payroll = {
-    id: crypto.randomUUID(),
-    payDate: $("payDate").value,
-    period: $("payPeriod").value.trim(),
-    hours: Number($("payHours").value) || 0,
-    rate: Number($("payRate").value) || 0,
-    gross: Number($("grossPay").value) || 0,
-    net: Number($("netPay").value) || 0,
-    taxes: Number($("taxesPay").value) || 0,
-    deductions: Number($("deductionsPay").value) || 0,
-    notes: $("payrollNotes").value.trim(),
-    createdAt: new Date().toISOString()
+$("saveDailyStatus").addEventListener("click", () => {
+  state.daily = {
+    date: todayKey(),
+    energy: $("energyLevel").value,
+    stress: $("stressLevel").value,
+    nextStep: $("nextStep").value.trim()
   };
+  save();
+  render();
+});
 
-  if (!payroll.net || payroll.net <= 0) return;
+$("taskForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = $("taskText").value.trim();
+  if (!text) return;
 
-  state.payrolls.push(payroll);
-
-  addTransaction(null, {
+  state.tasks.push({
     id: crypto.randomUUID(),
-    type: 'income',
-    amount: payroll.net,
-    description: 'Nómina semanal',
-    category: 'Trabajo',
-    paymentMethod: null,
-    date: payroll.payDate || new Date().toISOString()
+    text,
+    area: $("taskArea").value,
+    done: false,
+    date: new Date().toISOString()
   });
 
+  $("taskForm").reset();
   save();
+  render();
+});
 
-  $("payDate").value = '';
-  $("payPeriod").value = '';
-  $("payHours").value = '';
-  $("payRate").value = '';
-  $("grossPay").value = '';
-  $("netPay").value = '';
-  $("taxesPay").value = '';
-  $("deductionsPay").value = '';
-  $("payrollNotes").value = '';
-  $("paystubFile").value = '';
+$("ideaForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = $("ideaText").value.trim();
+  if (!text) return;
 
+  state.ideas.push({
+    id: crypto.randomUUID(),
+    text,
+    date: new Date().toISOString()
+  });
+
+  $("ideaForm").reset();
+  save();
   render();
 });
 
@@ -237,16 +287,6 @@ $("saveGoal").addEventListener("click", () => {
   render();
 });
 
-const saveChangeNotesButton = $("saveChangeNotes");
-if (saveChangeNotesButton) {
-  saveChangeNotesButton.addEventListener("click", () => {
-    state.notes = $("changeNotes").value.trim();
-    save();
-    saveChangeNotesButton.textContent = "Notas guardadas";
-    setTimeout(() => saveChangeNotesButton.textContent = "Guardar notas", 1400);
-  });
-}
-
 $("themeToggle").addEventListener("click", () => {
   state.theme = state.theme === "dark" ? "light" : "dark";
   save();
@@ -254,22 +294,23 @@ $("themeToggle").addEventListener("click", () => {
 });
 
 $("clearBtn").addEventListener("click", () => {
-  if (confirm("¿Borrar todos los movimientos y nóminas?")) {
+  if (confirm("¿Borrar todos los movimientos, pendientes e ideas?")) {
     state.transactions = [];
-    state.payrolls = [];
+    state.tasks = [];
+    state.ideas = [];
     save();
     render();
   }
 });
 
 $("exportBtn").addEventListener("click", () => {
-  const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.paymentMethod || '', t.amount])];
-  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv' });
+  const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.paymentMethod || "", t.amount])];
+  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
-  a.download = 'szr-finanzas.csv';
+  a.download = "szr-os-finanzas.csv";
   a.click();
   URL.revokeObjectURL(url);
 });
