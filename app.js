@@ -1,6 +1,11 @@
 const STORAGE_KEY = "szr-os-v1";
+const GITHUB_TOKEN_KEY = "szr-os-github-token";
+const GITHUB_OWNER = "romuloyair-lang";
+const GITHUB_REPO = "Finanzas-";
+const GITHUB_BRANCH = "main";
+const GITHUB_DATA_PATH = "data/szr-os-data.json";
 
-const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+const DEFAULT_STATE = {
   transactions: [],
   tasks: [],
   ideas: [],
@@ -9,9 +14,10 @@ const state = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
   theme: "dark"
 };
 
-if (!Object.prototype.hasOwnProperty.call(state, "transactions")) state.transactions = [];
-if (!Object.prototype.hasOwnProperty.call(state, "tasks")) state.tasks = [];
-if (!Object.prototype.hasOwnProperty.call(state, "ideas")) state.ideas = [];
+const state = Object.assign({}, DEFAULT_STATE, JSON.parse(localStorage.getItem(STORAGE_KEY)) || {});
+if (!Array.isArray(state.transactions)) state.transactions = [];
+if (!Array.isArray(state.tasks)) state.tasks = [];
+if (!Array.isArray(state.ideas)) state.ideas = [];
 if (!Object.prototype.hasOwnProperty.call(state, "daily")) state.daily = { date: "", energy: "", stress: "", nextStep: "" };
 if (!Object.prototype.hasOwnProperty.call(state, "goal")) state.goal = { name: "", target: 0, saved: 0 };
 if (!Object.prototype.hasOwnProperty.call(state, "theme")) state.theme = "dark";
@@ -19,8 +25,143 @@ if (!Object.prototype.hasOwnProperty.call(state, "theme")) state.theme = "dark";
 const $ = (id) => document.getElementById(id);
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n) || 0);
 
-function save() {
+function save(sync = true) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (sync) syncToGithub();
+}
+
+function setSyncStatus(text) {
+  const label = $("syncStatus");
+  if (label) label.textContent = text;
+}
+
+function getGithubToken() {
+  return localStorage.getItem(GITHUB_TOKEN_KEY) || "";
+}
+
+function setGithubHeaders() {
+  const token = getGithubToken();
+  return {
+    "Accept": "application/vnd.github+json",
+    "Authorization": `Bearer ${token}`,
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+}
+
+function encodeBase64Utf8(text) {
+  return btoa(unescape(encodeURIComponent(text)));
+}
+
+function decodeBase64Utf8(text) {
+  return decodeURIComponent(escape(atob(text.replace(/\n/g, ""))));
+}
+
+let syncTimer = null;
+let syncInProgress = false;
+let syncQueued = false;
+
+function syncToGithub() {
+  if (!getGithubToken()) {
+    setSyncStatus("Local");
+    return;
+  }
+
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(pushGithubData, 900);
+}
+
+async function getGithubFile() {
+  const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}?ref=${GITHUB_BRANCH}`;
+  const response = await fetch(url, { headers: setGithubHeaders() });
+
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
+
+  return response.json();
+}
+
+async function pushGithubData() {
+  if (!getGithubToken()) return;
+
+  if (syncInProgress) {
+    syncQueued = true;
+    return;
+  }
+
+  syncInProgress = true;
+  setSyncStatus("Guardando...");
+
+  try {
+    const currentFile = await getGithubFile();
+    const payload = {
+      updatedAt: new Date().toISOString(),
+      app: "SZR OS",
+      data: state
+    };
+
+    const body = {
+      message: `Update SZR OS data ${new Date().toISOString()}`,
+      content: encodeBase64Utf8(JSON.stringify(payload, null, 2)),
+      branch: GITHUB_BRANCH
+    };
+
+    if (currentFile?.sha) body.sha = currentFile.sha;
+
+    const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: {
+        ...setGithubHeaders(),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
+    setSyncStatus("GitHub actualizado");
+  } catch (error) {
+    console.error(error);
+    setSyncStatus("Error sync");
+    alert("No se pudo sincronizar con GitHub. Revisa que el token tenga permiso de Contents: Read and write.");
+  } finally {
+    syncInProgress = false;
+    if (syncQueued) {
+      syncQueued = false;
+      syncToGithub();
+    }
+  }
+}
+
+async function pullGithubData() {
+  if (!getGithubToken()) {
+    alert("Primero pega tu GitHub token y presiona Activar sync.");
+    return;
+  }
+
+  setSyncStatus("Leyendo...");
+  try {
+    const currentFile = await getGithubFile();
+    if (!currentFile?.content) {
+      setSyncStatus("Sin archivo");
+      return;
+    }
+
+    const payload = JSON.parse(decodeBase64Utf8(currentFile.content));
+    const remoteState = payload.data || payload;
+
+    Object.assign(state, DEFAULT_STATE, remoteState);
+    if (!Array.isArray(state.transactions)) state.transactions = [];
+    if (!Array.isArray(state.tasks)) state.tasks = [];
+    if (!Array.isArray(state.ideas)) state.ideas = [];
+
+    save(false);
+    render();
+    setSyncStatus("Datos cargados");
+  } catch (error) {
+    console.error(error);
+    setSyncStatus("Error lectura");
+    alert("No se pudieron leer los datos desde GitHub.");
+  }
 }
 
 function setTheme() {
@@ -142,6 +283,12 @@ function render() {
   renderTasks();
   renderIdeas();
 
+  const tokenInput = $("githubToken");
+  if (tokenInput && getGithubToken() && !tokenInput.value) {
+    tokenInput.placeholder = "Token guardado en este navegador";
+    setSyncStatus("Sync activo");
+  }
+
   const list = $("transactionList");
   if (!state.transactions.length) {
     list.className = "transaction-list empty";
@@ -202,6 +349,22 @@ function addTransaction(type = null) {
   $("typeIncome").checked = true;
   render();
 }
+
+$("saveGithubConfig").addEventListener("click", () => {
+  const token = $("githubToken").value.trim();
+  if (!token) {
+    alert("Pega primero tu GitHub token.");
+    return;
+  }
+
+  localStorage.setItem(GITHUB_TOKEN_KEY, token);
+  $("githubToken").value = "";
+  $("githubToken").placeholder = "Token guardado en este navegador";
+  setSyncStatus("Sync activo");
+  pushGithubData();
+});
+
+$("pullGithubData").addEventListener("click", pullGithubData);
 
 $("saveDailyStatus").addEventListener("click", () => {
   state.daily = {
