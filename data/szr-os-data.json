@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-24T18:51:46.787Z",
+  "updatedAt": "2026-05-24T18:53:54.309Z",
   "app": "SZR OS",
   "data": {
     "transactions": [],
@@ -16,6 +16,6 @@
       "target": 0,
       "saved": 0
     },
-    "theme": "dark"
+    "theme": "light"
   }
 }
