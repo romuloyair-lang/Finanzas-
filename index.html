@@ -6,22 +6,22 @@
   <meta name="theme-color" content="#0b0f17" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Finanzas SZR" />
-  <title>Finanzas SZR</title>
-  <link rel="manifest" href="manifest.json?v=20260524-7" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-7" />
-  <link rel="stylesheet" href="styles.css?v=20260524-7" />
+  <meta name="apple-mobile-web-app-title" content="SZR OS" />
+  <title>SZR OS</title>
+  <link rel="manifest" href="manifest.json?v=20260524-8" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260524-8" />
+  <link rel="stylesheet" href="styles.css?v=20260524-8" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="hero-card glass">
       <div class="status-row">
         <span id="todayLabel">Hoy</span>
-        <span class="pill">SZR Finance</span>
+        <span class="pill">SZR OS</span>
       </div>
       <div class="hero-title">
         <div>
-          <p class="muted">Balance actual</p>
+          <p class="muted">Centro personal</p>
           <h1 id="balanceAmount">$0.00</h1>
         </div>
         <button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button>
@@ -33,6 +33,28 @@
       </div>
     </section>
 
+    <section class="panel glass">
+      <div class="section-title"><h2>Estado de hoy</h2><span id="dailyStatusLabel">Sin registro</span></div>
+      <div class="two-col">
+        <label class="field"><span>Energía</span><select id="energyLevel"><option value="">Seleccionar</option><option>Baja</option><option>Media</option><option>Alta</option></select></label>
+        <label class="field"><span>Estrés</span><select id="stressLevel"><option value="">Seleccionar</option><option>Bajo</option><option>Medio</option><option>Alto</option></select></label>
+      </div>
+      <label class="field"><span>Siguiente paso importante</span><input id="nextStep" type="text" placeholder="Ej. limpiar cocina, revisar presupuesto, estudiar I-CAR" /></label>
+      <button type="button" id="saveDailyStatus" class="secondary-button">Guardar estado</button>
+    </section>
+
+    <section class="panel glass">
+      <div class="section-title"><h2>Hoy</h2><span id="taskCountLabel">0 pendientes</span></div>
+      <form id="taskForm">
+        <div class="two-col">
+          <label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. laundry, cocina, llamada, estudio" /></label>
+          <label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Personal</option><option>Estudio</option><option>Contenido</option><option>Otro</option></select></label>
+        </div>
+        <button type="submit" class="primary-button">Agregar pendiente</button>
+      </form>
+      <div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div>
+    </section>
+
     <section class="quick-actions" aria-label="Acciones rápidas">
       <button type="button" data-type="income" class="action-card income active">+ Ingreso</button>
       <button type="button" data-type="expense" class="action-card expense">− Gasto</button>
@@ -41,7 +63,7 @@
     </section>
 
     <section class="panel glass" id="movementPanel">
-      <div class="section-title"><h2>Nuevo movimiento</h2><span>iPhone ready</span></div>
+      <div class="section-title"><h2>Finanzas</h2><span>Movimiento rápido</span></div>
       <form id="transactionForm">
         <div class="segmented three-options">
           <input type="radio" name="type" id="typeIncome" value="income" checked />
@@ -51,7 +73,7 @@
           <input type="radio" name="type" id="typeWithdrawal" value="withdrawal" />
           <label for="typeWithdrawal">Retiro</label>
         </div>
-        <label class="field"><span>Descripción</span><input id="description" type="text" placeholder="Ej. Pago semanal, gasolina, herramienta" required /></label>
+        <label class="field"><span>Descripción</span><input id="description" type="text" placeholder="Ej. pago semanal, gasolina, herramienta" required /></label>
         <div class="two-col">
           <label class="field"><span>Monto</span><input id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" required /></label>
           <label class="field"><span>Categoría</span><select id="category"><option>Trabajo</option><option>Casa</option><option>Comida</option><option>Gasolina</option><option>Herramientas</option><option>Vehículo</option><option>Taller / Negocio</option><option>Viajes</option><option>Ahorro</option><option>Retiro de efectivo</option><option>Otro</option></select></label>
@@ -74,11 +96,20 @@
       </div>
     </section>
 
+    <section class="panel glass">
+      <div class="section-title"><h2>Ideas rápidas</h2><span id="ideaCountLabel">0 ideas</span></div>
+      <form id="ideaForm">
+        <label class="field"><span>Idea</span><input id="ideaText" type="text" placeholder="Ej. video, herramienta, taller, casa, compra futura" /></label>
+        <button type="submit" class="secondary-button">Guardar idea</button>
+      </form>
+      <div id="ideaList" class="transaction-list empty">Sin ideas todavía.</div>
+    </section>
+
     <section class="panel glass bottom-panel">
       <div class="section-title"><h2>Movimientos</h2><button type="button" id="clearBtn" class="text-button">Limpiar</button></div>
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-7"></script>
+  <script src="app.js?v=20260524-8"></script>
 </body>
 </html>
