@@ -24,7 +24,7 @@
           <p class="muted">Balance actual</p>
           <h1 id="balanceAmount">$0.00</h1>
         </div>
-        <button class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button>
+        <button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button>
       </div>
       <div class="mini-grid">
         <div>
@@ -42,13 +42,13 @@
       </div>
     </section>
 
-    <section class="quick-actions">
-      <button data-type="income" class="action-card income">+ Ingreso</button>
-      <button data-type="expense" class="action-card expense">− Gasto</button>
-      <button id="exportBtn" class="action-card neutral">Exportar</button>
+    <section class="quick-actions" aria-label="Acciones rápidas">
+      <button type="button" data-type="income" class="action-card income active">+ Ingreso</button>
+      <button type="button" data-type="expense" class="action-card expense">− Gasto</button>
+      <button type="button" id="exportBtn" class="action-card neutral">Exportar</button>
     </section>
 
-    <section class="panel glass">
+    <section class="panel glass" id="movementPanel">
       <div class="section-title">
         <h2>Nuevo movimiento</h2>
         <span>iPhone ready</span>
@@ -105,14 +105,14 @@
           <input id="goalTarget" type="number" inputmode="decimal" placeholder="Meta $" />
           <input id="goalSaved" type="number" inputmode="decimal" placeholder="Ahorrado $" />
         </div>
-        <button id="saveGoal" class="secondary-button">Actualizar meta</button>
+        <button type="button" id="saveGoal" class="secondary-button">Actualizar meta</button>
       </div>
     </section>
 
     <section class="panel glass bottom-panel">
       <div class="section-title">
         <h2>Movimientos</h2>
-        <button id="clearBtn" class="text-button">Limpiar</button>
+        <button type="button" id="clearBtn" class="text-button">Limpiar</button>
       </div>
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
