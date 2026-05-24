@@ -31,14 +31,14 @@ function setActiveQuickAction(type) {
 function togglePaymentMethod() {
   const type = document.querySelector('input[name="type"]:checked')?.value;
   const field = $("paymentMethodField");
-  field.style.display = type === "income" ? "none" : "block";
+  field.style.display = type === "expense" ? "block" : "none";
 }
 
 function render() {
   setTheme();
 
   const income = state.transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const expenses = state.transactions.filter(t => t.type !== "income").reduce((s, t) => s + t.amount, 0);
+  const expenses = state.transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   const balance = income - expenses;
   const free = balance - (Number(state.goal.saved) || 0);
 
@@ -71,15 +71,22 @@ function render() {
   }
 
   list.className = "transaction-list";
-  list.innerHTML = state.transactions.slice().reverse().map(t => `
-    <div class="transaction-row">
-      <div>
-        <strong>${escapeHtml(t.description)}</strong>
-        <small>${escapeHtml(t.category)} · ${t.paymentMethod ? (t.paymentMethod === "cash" ? "Efectivo" : "Tarjeta") + ' · ' : ''}${new Date(t.date).toLocaleDateString("es-MX")}</small>
+  list.innerHTML = state.transactions.slice().reverse().map(t => {
+    const paymentLabel = t.type === "expense" && t.paymentMethod ? (t.paymentMethod === "cash" ? "Efectivo" : "Tarjeta") + " · " : "";
+    const typeLabel = t.type === "withdrawal" ? "Retiro · " : "";
+    const amountClass = t.type === "income" ? "amount-income" : (t.type === "expense" ? "amount-expense" : "amount-withdrawal");
+    const sign = t.type === "income" ? "+" : (t.type === "expense" ? "−" : "");
+
+    return `
+      <div class="transaction-row">
+        <div>
+          <strong>${escapeHtml(t.description)}</strong>
+          <small>${typeLabel}${escapeHtml(t.category)} · ${paymentLabel}${new Date(t.date).toLocaleDateString("es-MX")}</small>
+        </div>
+        <div class="${amountClass}">${sign}${money(t.amount)}</div>
       </div>
-      <div class="${t.type === "income" ? "amount-income" : "amount-expense"}">${t.type === "income" ? "+" : "−"}${money(t.amount)}</div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function escapeHtml(str) {
@@ -97,7 +104,7 @@ function addTransaction(type = null) {
   const amount = Number($("amount").value);
   const description = $("description").value.trim();
   const category = $("category").value;
-  const paymentMethod = selectedType === "income" ? null : $("paymentMethod").value;
+  const paymentMethod = selectedType === "expense" ? $("paymentMethod").value : null;
 
   if (!description || !amount || amount <= 0) return;
 
