@@ -1,51 +1,82 @@
-const STORAGE_KEY = "szr-os-v1";
-const GITHUB_TOKEN_KEY = "szr-os-github-token";
+const STORAGE_KEY = "yair-os-v2";
+const GITHUB_TOKEN_KEY = "yair-os-github-token";
+const GOOGLE_SCRIPT_URL_KEY = "yair-os-google-script-url";
+const OPENAI_PROXY_URL_KEY = "yair-os-openai-proxy-url";
+
 const GITHUB_OWNER = "romuloyair-lang";
 const GITHUB_REPO = "Finanzas-";
 const GITHUB_BRANCH = "main";
-const GITHUB_DATA_PATH = "data/szr-os-data.json";
+const GITHUB_DATA_PATH = "data/yair-os-data.json";
 
 const DEFAULT_STATE = {
   transactions: [],
   tasks: [],
-  ideas: [],
-  daily: { date: "", energy: "", stress: "", nextStep: "" },
-  goal: { name: "", target: 0, saved: 0 },
+  memories: [],
   theme: "dark"
 };
 
-const state = Object.assign({}, DEFAULT_STATE, JSON.parse(localStorage.getItem(STORAGE_KEY)) || {});
-if (!Array.isArray(state.transactions)) state.transactions = [];
-if (!Array.isArray(state.tasks)) state.tasks = [];
-if (!Array.isArray(state.ideas)) state.ideas = [];
-if (!Object.prototype.hasOwnProperty.call(state, "daily")) state.daily = { date: "", energy: "", stress: "", nextStep: "" };
-if (!Object.prototype.hasOwnProperty.call(state, "goal")) state.goal = { name: "", target: 0, saved: 0 };
-if (!Object.prototype.hasOwnProperty.call(state, "theme")) state.theme = "dark";
+const savedState = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+const state = {
+  ...DEFAULT_STATE,
+  ...savedState,
+  transactions: Array.isArray(savedState.transactions) ? savedState.transactions : [],
+  tasks: Array.isArray(savedState.tasks) ? savedState.tasks : [],
+  memories: Array.isArray(savedState.memories) ? savedState.memories : []
+};
 
 const $ = (id) => document.getElementById(id);
+const exists = (id) => Boolean($(id));
 const money = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(Number(n) || 0);
+const todayKey = () => new Date().toISOString().slice(0, 10);
+
+function safeUUID() {
+  return crypto?.randomUUID?.() || `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
 
 function save(sync = true) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   if (sync) syncToGithub();
 }
 
-function setSyncStatus(text) {
-  const label = $("syncStatus");
-  if (label) label.textContent = text;
-}
-
 function getGithubToken() {
   return localStorage.getItem(GITHUB_TOKEN_KEY) || "";
 }
 
-function setGithubHeaders() {
-  const token = getGithubToken();
-  return {
-    "Accept": "application/vnd.github+json",
-    "Authorization": `Bearer ${token}`,
-    "X-GitHub-Api-Version": "2022-11-28"
-  };
+function getGoogleScriptUrl() {
+  return localStorage.getItem(GOOGLE_SCRIPT_URL_KEY) || "";
+}
+
+function getOpenAiProxyUrl() {
+  return localStorage.getItem(OPENAI_PROXY_URL_KEY) || "";
+}
+
+function setSyncStatus(text) {
+  if (exists("syncStatus")) $("syncStatus").textContent = text;
+}
+
+function setTheme() {
+  document.body.classList.toggle("light", state.theme === "light");
+}
+
+function setActiveQuickAction(type) {
+  document.querySelectorAll(".quick-actions [data-type]").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.type === type);
+  });
+}
+
+function togglePaymentMethod() {
+  const type = document.querySelector('input[name="type"]:checked')?.value;
+  if (exists("paymentMethodField")) $("paymentMethodField").style.display = type === "expense" ? "block" : "none";
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>'"]/g, (c) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    "'": "&#39;",
+    "\"": "&quot;"
+  }[c]));
 }
 
 function encodeBase64Utf8(text) {
@@ -54,6 +85,14 @@ function encodeBase64Utf8(text) {
 
 function decodeBase64Utf8(text) {
   return decodeURIComponent(escape(atob(text.replace(/\n/g, ""))));
+}
+
+function githubHeaders() {
+  return {
+    "Accept": "application/vnd.github+json",
+    "Authorization": `Bearer ${getGithubToken()}`,
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
 }
 
 let syncTimer = null;
@@ -65,24 +104,20 @@ function syncToGithub() {
     setSyncStatus("Local");
     return;
   }
-
   clearTimeout(syncTimer);
   syncTimer = setTimeout(pushGithubData, 900);
 }
 
 async function getGithubFile() {
   const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}?ref=${GITHUB_BRANCH}`;
-  const response = await fetch(url, { headers: setGithubHeaders() });
-
+  const response = await fetch(url, { headers: githubHeaders() });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
-
   return response.json();
 }
 
 async function pushGithubData() {
   if (!getGithubToken()) return;
-
   if (syncInProgress) {
     syncQueued = true;
     return;
@@ -95,12 +130,13 @@ async function pushGithubData() {
     const currentFile = await getGithubFile();
     const payload = {
       updatedAt: new Date().toISOString(),
-      app: "SZR OS",
+      app: "Yair OS",
+      source: "GitHub Pages",
       data: state
     };
 
     const body = {
-      message: `Update SZR OS data ${new Date().toISOString()}`,
+      message: `Update Yair OS data ${new Date().toISOString()}`,
       content: encodeBase64Utf8(JSON.stringify(payload, null, 2)),
       branch: GITHUB_BRANCH
     };
@@ -110,10 +146,7 @@ async function pushGithubData() {
     const url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_DATA_PATH}`;
     const response = await fetch(url, {
       method: "PUT",
-      headers: {
-        ...setGithubHeaders(),
-        "Content-Type": "application/json"
-      },
+      headers: { ...githubHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
 
@@ -121,8 +154,7 @@ async function pushGithubData() {
     setSyncStatus("GitHub actualizado");
   } catch (error) {
     console.error(error);
-    setSyncStatus("Error sync");
-    alert("No se pudo sincronizar con GitHub. Revisa que el token tenga permiso de Contents: Read and write.");
+    setSyncStatus("Error GitHub");
   } finally {
     syncInProgress = false;
     if (syncQueued) {
@@ -134,7 +166,7 @@ async function pushGithubData() {
 
 async function pullGithubData() {
   if (!getGithubToken()) {
-    alert("Primero pega tu GitHub token y presiona Activar sync.");
+    alert("Primero pega tu GitHub token y presiona Activar sync GitHub.");
     return;
   }
 
@@ -148,12 +180,10 @@ async function pullGithubData() {
 
     const payload = JSON.parse(decodeBase64Utf8(currentFile.content));
     const remoteState = payload.data || payload;
-
     Object.assign(state, DEFAULT_STATE, remoteState);
-    if (!Array.isArray(state.transactions)) state.transactions = [];
-    if (!Array.isArray(state.tasks)) state.tasks = [];
-    if (!Array.isArray(state.ideas)) state.ideas = [];
-
+    state.transactions = Array.isArray(state.transactions) ? state.transactions : [];
+    state.tasks = Array.isArray(state.tasks) ? state.tasks : [];
+    state.memories = Array.isArray(state.memories) ? state.memories : [];
     save(false);
     render();
     setSyncStatus("Datos cargados");
@@ -164,46 +194,151 @@ async function pullGithubData() {
   }
 }
 
-function setTheme() {
-  document.body.classList.toggle("light", state.theme === "light");
-}
+async function sendToGoogle(action, payload) {
+  const scriptUrl = getGoogleScriptUrl();
+  if (!scriptUrl) return { skipped: true };
 
-function setActiveQuickAction(type) {
-  document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.type === type);
-  });
-}
-
-function togglePaymentMethod() {
-  const type = document.querySelector('input[name="type"]:checked')?.value;
-  const field = $("paymentMethodField");
-  if (field) field.style.display = type === "expense" ? "block" : "none";
-}
-
-function todayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function renderDailyStatus() {
-  const today = todayKey();
-  const hasToday = state.daily.date === today;
-
-  $("energyLevel").value = hasToday ? state.daily.energy || "" : "";
-  $("stressLevel").value = hasToday ? state.daily.stress || "" : "";
-  $("nextStep").value = hasToday ? state.daily.nextStep || "" : "";
-
-  const label = $("dailyStatusLabel");
-  if (!hasToday || (!state.daily.energy && !state.daily.stress && !state.daily.nextStep)) {
-    label.textContent = "Sin registro";
-  } else {
-    label.textContent = "Guardado";
+  try {
+    const response = await fetch(scriptUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action, payload, app: "Yair OS", createdAt: new Date().toISOString() })
+    });
+    return { success: true, response };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error };
   }
+}
+
+async function askOpenAi() {
+  const proxyUrl = getOpenAiProxyUrl();
+  const prompt = $("aiPrompt")?.value.trim();
+  const answer = $("aiAnswer");
+
+  if (!answer) return;
+  if (!proxyUrl) {
+    answer.className = "ai-answer empty";
+    answer.textContent = "Primero configura el OpenAI proxy URL.";
+    return;
+  }
+  if (!prompt) {
+    answer.className = "ai-answer empty";
+    answer.textContent = "Escribe una pregunta para tu sistema.";
+    return;
+  }
+
+  answer.className = "ai-answer";
+  answer.textContent = "Analizando...";
+
+  const context = {
+    transactions: state.transactions.slice(-50),
+    tasks: state.tasks.slice(-30),
+    memories: state.memories.slice(-30),
+    totals: getTotals()
+  };
+
+  try {
+    const response = await fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, context })
+    });
+
+    if (!response.ok) throw new Error(`Proxy respondió ${response.status}`);
+    const data = await response.json();
+    answer.textContent = data.answer || data.text || "Sin respuesta.";
+  } catch (error) {
+    console.error(error);
+    answer.className = "ai-answer empty";
+    answer.textContent = "No se pudo consultar OpenAI. Revisa el proxy URL.";
+  }
+}
+
+function getTotals() {
+  const income = state.transactions.filter((t) => t.type === "income").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const expenses = state.transactions.filter((t) => t.type === "expense").reduce((s, t) => s + Number(t.amount || 0), 0);
+  const withdrawals = state.transactions.filter((t) => t.type === "withdrawal").reduce((s, t) => s + Number(t.amount || 0), 0);
+  return { income, expenses, withdrawals, balance: income - expenses - withdrawals };
+}
+
+async function addTransaction() {
+  const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
+  const amount = Number($("amount")?.value || 0);
+  const description = $("description")?.value.trim();
+  const category = $("category")?.value || "Otro";
+  const paymentMethod = selectedType === "expense" ? $("paymentMethod")?.value || "" : "";
+
+  if (!description || !amount || amount <= 0) return;
+
+  const transaction = {
+    id: safeUUID(),
+    type: selectedType,
+    amount,
+    description,
+    category,
+    paymentMethod,
+    date: new Date().toISOString()
+  };
+
+  state.transactions.push(transaction);
+  save();
+  await sendToGoogle("transaction", transaction);
+  $("transactionForm")?.reset();
+  if (exists("typeIncome")) $("typeIncome").checked = true;
+  render();
+}
+
+async function addMemory(event) {
+  event.preventDefault();
+  const text = $("memoryText")?.value.trim();
+  if (!text) return;
+
+  const memory = {
+    id: safeUUID(),
+    date: new Date().toISOString(),
+    category: $("memoryCategory")?.value || "Personal",
+    text,
+    priority: "Media",
+    status: "Activo",
+    source: "Yair OS App"
+  };
+
+  state.memories.push(memory);
+  save();
+  await sendToGoogle("memory", memory);
+  $("memoryForm")?.reset();
+  render();
+}
+
+async function addTask(event) {
+  event.preventDefault();
+  const text = $("taskText")?.value.trim();
+  if (!text) return;
+
+  const task = {
+    id: safeUUID(),
+    text,
+    area: $("taskArea")?.value || "Personal",
+    targetDate: $("taskDate")?.value || "",
+    done: false,
+    date: new Date().toISOString()
+  };
+
+  state.tasks.push(task);
+  save();
+  await sendToGoogle("task", task);
+  $("taskForm")?.reset();
+  render();
 }
 
 function renderTasks() {
   const list = $("taskList");
-  const pendingTasks = state.tasks.filter(t => !t.done);
-  $("taskCountLabel").textContent = `${pendingTasks.length} pendientes`;
+  if (!list) return;
+
+  const pendingTasks = state.tasks.filter((t) => !t.done);
+  if (exists("taskCountLabel")) $("taskCountLabel").textContent = `${pendingTasks.length} pendientes`;
 
   if (!state.tasks.length) {
     list.className = "transaction-list empty";
@@ -212,84 +347,32 @@ function renderTasks() {
   }
 
   list.className = "transaction-list";
-  list.innerHTML = state.tasks.slice().reverse().map(t => `
+  list.innerHTML = state.tasks.slice().reverse().map((t) => `
     <div class="transaction-row">
       <div>
         <strong>${t.done ? "✓ " : ""}${escapeHtml(t.text)}</strong>
-        <small>${escapeHtml(t.area)} · ${new Date(t.date).toLocaleDateString("es-MX")}</small>
+        <small>${escapeHtml(t.area)}${t.targetDate ? " · " + escapeHtml(t.targetDate) : ""}</small>
       </div>
       <button type="button" class="text-button" data-task-id="${t.id}">${t.done ? "Reabrir" : "Hecho"}</button>
     </div>
   `).join("");
 
-  document.querySelectorAll("[data-task-id]").forEach(btn => {
+  document.querySelectorAll("[data-task-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const task = state.tasks.find(t => t.id === btn.dataset.taskId);
+      const task = state.tasks.find((t) => t.id === btn.dataset.taskId);
       if (!task) return;
       task.done = !task.done;
       save();
+      sendToGoogle("task", task);
       render();
     });
   });
 }
 
-function renderIdeas() {
-  const list = $("ideaList");
-  $("ideaCountLabel").textContent = `${state.ideas.length} ideas`;
-
-  if (!state.ideas.length) {
-    list.className = "transaction-list empty";
-    list.textContent = "Sin ideas todavía.";
-    return;
-  }
-
-  list.className = "transaction-list";
-  list.innerHTML = state.ideas.slice().reverse().map(i => `
-    <div class="transaction-row">
-      <div>
-        <strong>${escapeHtml(i.text)}</strong>
-        <small>${new Date(i.date).toLocaleDateString("es-MX")}</small>
-      </div>
-    </div>
-  `).join("");
-}
-
-function render() {
-  setTheme();
-
-  const income = state.transactions.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
-  const expenses = state.transactions.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
-  const balance = income - expenses;
-  const free = balance - (Number(state.goal.saved) || 0);
-
-  $("balanceAmount").textContent = money(balance);
-  $("incomeAmount").textContent = money(income);
-  $("expenseAmount").textContent = money(expenses);
-  $("freeAmount").textContent = money(free);
-  $("todayLabel").textContent = new Date().toLocaleDateString("es-MX", { weekday: "long", month: "short", day: "numeric" });
-
-  $("goalName").value = state.goal.name || "";
-  $("goalTarget").value = state.goal.target || "";
-  $("goalSaved").value = state.goal.saved || "";
-
-  const pct = state.goal.target > 0 ? Math.min(100, Math.round((state.goal.saved / state.goal.target) * 100)) : 0;
-  $("goalBar").style.width = `${pct}%`;
-  $("goalProgressLabel").textContent = `${pct}%`;
-
-  const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
-  setActiveQuickAction(selectedType);
-  togglePaymentMethod();
-  renderDailyStatus();
-  renderTasks();
-  renderIdeas();
-
-  const tokenInput = $("githubToken");
-  if (tokenInput && getGithubToken() && !tokenInput.value) {
-    tokenInput.placeholder = "Token guardado en este navegador";
-    setSyncStatus("Sync activo");
-  }
-
+function renderTransactions() {
   const list = $("transactionList");
+  if (!list) return;
+
   if (!state.transactions.length) {
     list.className = "transaction-list empty";
     list.textContent = "Sin movimientos todavía.";
@@ -297,17 +380,17 @@ function render() {
   }
 
   list.className = "transaction-list";
-  list.innerHTML = state.transactions.slice().reverse().map(t => {
-    const paymentLabel = t.type === "expense" && t.paymentMethod ? (t.paymentMethod === "cash" ? "Efectivo" : "Tarjeta") + " · " : "";
-    const typeLabel = t.type === "withdrawal" ? "Retiro · " : "";
-    const amountClass = t.type === "income" ? "amount-income" : (t.type === "expense" ? "amount-expense" : "amount-withdrawal");
-    const sign = t.type === "income" ? "+" : (t.type === "expense" ? "−" : "");
+  list.innerHTML = state.transactions.slice().reverse().map((t) => {
+    const method = t.paymentMethod ? `${t.paymentMethod} · ` : "";
+    const typeLabel = t.type === "income" ? "Ingreso" : t.type === "expense" ? "Gasto" : "Retiro";
+    const amountClass = t.type === "income" ? "amount-income" : t.type === "expense" ? "amount-expense" : "amount-withdrawal";
+    const sign = t.type === "income" ? "+" : "−";
 
     return `
       <div class="transaction-row">
         <div>
           <strong>${escapeHtml(t.description)}</strong>
-          <small>${typeLabel}${escapeHtml(t.category)} · ${paymentLabel}${new Date(t.date).toLocaleDateString("es-MX")}</small>
+          <small>${typeLabel} · ${escapeHtml(t.category)} · ${method}${new Date(t.date).toLocaleDateString("es-MX")}</small>
         </div>
         <div class="${amountClass}">${sign}${money(t.amount)}</div>
       </div>
@@ -315,167 +398,123 @@ function render() {
   }).join("");
 }
 
-function escapeHtml(str) {
-  return String(str).replace(/[&<>'"]/g, c => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "'": "&#39;",
-    "\"": "&quot;"
-  }[c]));
-}
+function render() {
+  setTheme();
+  const totals = getTotals();
 
-function addTransaction(type = null) {
-  const selectedType = type || document.querySelector('input[name="type"]:checked').value;
-  const amount = Number($("amount").value);
-  const description = $("description").value.trim();
-  const category = $("category").value;
-  const paymentMethod = selectedType === "expense" ? $("paymentMethod").value : null;
+  if (exists("balanceAmount")) $("balanceAmount").textContent = money(totals.balance);
+  if (exists("incomeAmount")) $("incomeAmount").textContent = money(totals.income);
+  if (exists("expenseAmount")) $("expenseAmount").textContent = money(totals.expenses + totals.withdrawals);
+  if (exists("freeAmount")) $("freeAmount").textContent = money(totals.balance);
+  if (exists("todayLabel")) $("todayLabel").textContent = new Date().toLocaleDateString("es-MX", { weekday: "long", month: "short", day: "numeric" });
 
-  if (!description || !amount || amount <= 0) return;
+  const selectedType = document.querySelector('input[name="type"]:checked')?.value || "income";
+  setActiveQuickAction(selectedType);
+  togglePaymentMethod();
+  renderTasks();
+  renderTransactions();
 
-  state.transactions.push({
-    id: crypto.randomUUID(),
-    type: selectedType,
-    amount,
-    description,
-    category,
-    paymentMethod,
-    date: new Date().toISOString()
-  });
-
-  save();
-  $("transactionForm").reset();
-  $("typeIncome").checked = true;
-  render();
-}
-
-$("saveGithubConfig").addEventListener("click", () => {
-  const token = $("githubToken").value.trim();
-  if (!token) {
-    alert("Pega primero tu GitHub token.");
-    return;
+  if (exists("githubToken") && getGithubToken() && !$("githubToken").value) {
+    $("githubToken").placeholder = "Token guardado en este navegador";
+    setSyncStatus("Sync activo");
   }
+  if (exists("googleScriptUrl")) $("googleScriptUrl").value = getGoogleScriptUrl();
+  if (exists("openAiProxyUrl")) $("openAiProxyUrl").value = getOpenAiProxyUrl();
+}
 
-  localStorage.setItem(GITHUB_TOKEN_KEY, token);
-  $("githubToken").value = "";
-  $("githubToken").placeholder = "Token guardado en este navegador";
-  setSyncStatus("Sync activo");
-  pushGithubData();
-});
-
-$("pullGithubData").addEventListener("click", pullGithubData);
-
-$("saveDailyStatus").addEventListener("click", () => {
-  state.daily = {
-    date: todayKey(),
-    energy: $("energyLevel").value,
-    stress: $("stressLevel").value,
-    nextStep: $("nextStep").value.trim()
-  };
-  save();
-  render();
-});
-
-$("taskForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const text = $("taskText").value.trim();
-  if (!text) return;
-
-  state.tasks.push({
-    id: crypto.randomUUID(),
-    text,
-    area: $("taskArea").value,
-    done: false,
-    date: new Date().toISOString()
+function bindEvents() {
+  $("transactionForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    addTransaction();
   });
 
-  $("taskForm").reset();
-  save();
-  render();
-});
+  $("memoryForm")?.addEventListener("submit", addMemory);
+  $("taskForm")?.addEventListener("submit", addTask);
+  $("askAiBtn")?.addEventListener("click", askOpenAi);
 
-$("ideaForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const text = $("ideaText").value.trim();
-  if (!text) return;
-
-  state.ideas.push({
-    id: crypto.randomUUID(),
-    text,
-    date: new Date().toISOString()
+  $("saveGithubConfig")?.addEventListener("click", () => {
+    const token = $("githubToken")?.value.trim();
+    if (!token) {
+      alert("Pega primero tu GitHub token.");
+      return;
+    }
+    localStorage.setItem(GITHUB_TOKEN_KEY, token);
+    $("githubToken").value = "";
+    $("githubToken").placeholder = "Token guardado en este navegador";
+    setSyncStatus("Sync activo");
+    pushGithubData();
   });
 
-  $("ideaForm").reset();
-  save();
-  render();
-});
+  $("pullGithubData")?.addEventListener("click", pullGithubData);
 
-$("transactionForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  addTransaction();
-});
-
-document.querySelectorAll(".quick-actions [data-type]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const type = btn.dataset.type;
-
-    if (type === "income") $("typeIncome").checked = true;
-    if (type === "expense") $("typeExpense").checked = true;
-    if (type === "withdrawal") $("typeWithdrawal").checked = true;
-
-    setActiveQuickAction(type);
-    togglePaymentMethod();
-
-    $("movementPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setTimeout(() => $("description").focus(), 250);
+  $("saveGoogleConfig")?.addEventListener("click", () => {
+    const url = $("googleScriptUrl")?.value.trim();
+    if (!url) {
+      alert("Pega primero tu Google Apps Script Web App URL.");
+      return;
+    }
+    localStorage.setItem(GOOGLE_SCRIPT_URL_KEY, url);
+    setSyncStatus("Google listo");
   });
-});
 
-document.querySelectorAll('input[name="type"]').forEach(input => {
-  input.addEventListener("change", () => {
-    setActiveQuickAction(input.value);
-    togglePaymentMethod();
+  $("saveOpenAiConfig")?.addEventListener("click", () => {
+    const url = $("openAiProxyUrl")?.value.trim();
+    if (!url) {
+      alert("Pega primero tu OpenAI proxy URL.");
+      return;
+    }
+    localStorage.setItem(OPENAI_PROXY_URL_KEY, url);
+    setSyncStatus("OpenAI listo");
   });
-});
 
-$("saveGoal").addEventListener("click", () => {
-  state.goal = {
-    name: $("goalName").value.trim(),
-    target: Number($("goalTarget").value) || 0,
-    saved: Number($("goalSaved").value) || 0
-  };
-
-  save();
-  render();
-});
-
-$("themeToggle").addEventListener("click", () => {
-  state.theme = state.theme === "dark" ? "light" : "dark";
-  save();
-  render();
-});
-
-$("clearBtn").addEventListener("click", () => {
-  if (confirm("¿Borrar todos los movimientos, pendientes e ideas?")) {
-    state.transactions = [];
-    state.tasks = [];
-    state.ideas = [];
+  $("themeToggle")?.addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark";
     save();
     render();
-  }
-});
+  });
 
-$("exportBtn").addEventListener("click", () => {
-  const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map(t => [t.date, t.type, t.description, t.category, t.paymentMethod || "", t.amount])];
-  const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "szr-os-finanzas.csv";
-  a.click();
-  URL.revokeObjectURL(url);
-});
+  $("clearBtn")?.addEventListener("click", () => {
+    if (confirm("¿Borrar todos los movimientos, pendientes y memorias locales?")) {
+      state.transactions = [];
+      state.tasks = [];
+      state.memories = [];
+      save();
+      render();
+    }
+  });
 
+  $("exportBtn")?.addEventListener("click", () => {
+    const rows = [["date", "type", "description", "category", "paymentMethod", "amount"], ...state.transactions.map((t) => [t.date, t.type, t.description, t.category, t.paymentMethod || "", t.amount])];
+    const csv = rows.map((r) => r.map((v) => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "yair-os-finanzas.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.querySelectorAll(".quick-actions [data-type]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const type = btn.dataset.type;
+      if (exists("typeIncome") && type === "income") $("typeIncome").checked = true;
+      if (exists("typeExpense") && type === "expense") $("typeExpense").checked = true;
+      if (exists("typeWithdrawal") && type === "withdrawal") $("typeWithdrawal").checked = true;
+      setActiveQuickAction(type);
+      togglePaymentMethod();
+      $("movementPanel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setTimeout(() => $("description")?.focus(), 250);
+    });
+  });
+
+  document.querySelectorAll('input[name="type"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      setActiveQuickAction(input.value);
+      togglePaymentMethod();
+    });
+  });
+}
+
+bindEvents();
 render();
