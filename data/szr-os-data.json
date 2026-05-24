@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-24T18:58:56.461Z",
+  "updatedAt": "2026-05-24T19:00:22.819Z",
   "app": "SZR OS",
   "data": {
     "transactions": [
@@ -20,6 +20,15 @@
         "category": "Trabajo",
         "paymentMethod": null,
         "date": "2026-05-24T18:55:42.974Z"
+      },
+      {
+        "id": "f3e54ab4-f873-41df-9de9-f7da4582b143",
+        "type": "income",
+        "amount": 711,
+        "description": "Pho",
+        "category": "Trabajo",
+        "paymentMethod": null,
+        "date": "2026-05-24T19:00:21.654Z"
       }
     ],
     "tasks": [],
