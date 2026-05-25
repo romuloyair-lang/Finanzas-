@@ -8,17 +8,80 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Yair OS" />
   <title>Yair OS</title>
-  <link rel="manifest" href="manifest.json?v=20260525-02" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260525-02" />
-  <link rel="stylesheet" href="styles.css?v=20260525-02" />
+  <link rel="manifest" href="manifest.json?v=20260525-03" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260525-03" />
+  <link rel="stylesheet" href="styles.css?v=20260525-03" />
 </head>
 <body>
+  <div class="drawer-backdrop" id="settingsBackdrop" hidden></div>
+  <aside class="settings-drawer glass" id="settingsPanel" aria-hidden="true">
+    <div class="drawer-header">
+      <div><p class="muted">Personalización</p><h2>Menú</h2></div>
+      <button type="button" id="closeSettingsBtn" class="round-button" aria-label="Cerrar menú">×</button>
+    </div>
+
+    <details open>
+      <summary>Ajustes de la app</summary>
+      <form id="settingsForm">
+        <label class="field"><span>Nombre de la app</span><input id="settingAppName" type="text" placeholder="Yair OS" /></label>
+        <div class="two-col">
+          <label class="field"><span>Moneda</span><select id="settingCurrency"><option value="USD">USD</option><option value="MXN">MXN</option></select></label>
+          <label class="field"><span>Tema</span><select id="settingTheme"><option value="dark">Oscuro</option><option value="light">Claro</option><option value="system">Sistema</option></select></label>
+        </div>
+        <label class="field"><span>Presupuesto mensual</span><input id="settingMonthlyBudget" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></label>
+        <button class="primary-button" type="submit">Guardar ajustes</button>
+        <button class="ghost-button" id="resetSettingsBtn" type="button">Restablecer ajustes</button>
+      </form>
+    </details>
+
+    <details>
+      <summary>Memoria GPT</summary>
+      <form id="memoryForm">
+        <label class="field"><span>Categoría</span><select id="memoryCategory"><option>Finanzas</option><option>Casa</option><option>Vehículos</option><option>Trabajo</option><option>Contenido</option><option>Proyectos</option><option>Personal</option></select></label>
+        <label class="field"><span>Dato importante</span><textarea id="memoryText" placeholder="Ej. Mi prioridad de este mes es organizar finanzas y bajar gastos." required></textarea></label>
+        <button class="secondary-button" type="submit">Guardar en memoria</button>
+      </form>
+    </details>
+
+    <details>
+      <summary>Agenda y pendientes</summary>
+      <form id="taskForm">
+        <label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. lavar camioneta, pagar UFCU" required /></label>
+        <div class="two-col"><label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Vehículo</option><option>Finanzas</option><option>Contenido</option><option>Personal</option></select></label><label class="field"><span>Fecha objetivo</span><input id="taskDate" type="date" /></label></div>
+        <button class="secondary-button" type="submit">Guardar pendiente</button>
+      </form>
+      <div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div>
+    </details>
+
+    <details>
+      <summary>Asistente IA</summary>
+      <label class="field"><span>Pregunta para tu sistema</span><textarea id="aiPrompt" placeholder="Ej. analiza mis gastos y dime qué debo hacer esta semana"></textarea></label>
+      <button class="primary-button" id="askAiBtn" type="button">Preguntar a GPT</button>
+      <div id="aiAnswer" class="ai-answer empty">Configura un proxy OpenAI para usar esta función.</div>
+    </details>
+
+    <details>
+      <summary>Llaves, APIs e integraciones</summary>
+      <label class="field"><span>GitHub token local</span><input id="githubToken" type="password" placeholder="Token con Contents: read/write" /></label>
+      <button class="secondary-button" id="saveGithubConfig" type="button">Activar sync GitHub</button>
+      <button class="ghost-button" id="pullGithubData" type="button">Leer datos desde GitHub</button>
+
+      <label class="field"><span>Google Apps Script Web App URL</span><input id="googleScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
+      <button class="secondary-button" id="saveGoogleConfig" type="button">Guardar conexión Google</button>
+      <p class="helper-text">Google Apps Script escribe en Sheets, puede crear eventos en Calendar y usar Gmail cuando autorices el script.</p>
+
+      <label class="field"><span>OpenAI proxy URL</span><input id="openAiProxyUrl" type="url" placeholder="https://tu-backend.vercel.app/api/openai" /></label>
+      <button class="secondary-button" id="saveOpenAiConfig" type="button">Guardar conexión OpenAI</button>
+      <p class="helper-text">No pongas tu API key de OpenAI en esta página pública. Usa un proxy seguro.</p>
+    </details>
+  </aside>
+
   <main class="phone-shell">
     <section class="hero-card glass">
       <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill" id="syncStatus">Local</span></div>
       <div class="hero-title">
         <div><p class="muted" id="appNameLabel">Yair OS</p><h1 id="balanceAmount">$0.00</h1></div>
-        <button type="button" class="round-button" id="openSettingsBtn" aria-label="Abrir ajustes">⚙︎</button>
+        <button type="button" class="menu-button" id="openSettingsBtn" aria-label="Abrir menú"><span></span><span></span><span></span></button>
       </div>
       <div class="mini-grid">
         <div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div>
@@ -32,65 +95,6 @@
       <button type="button" data-type="expense" class="action-card expense">− Gasto</button>
       <button type="button" data-type="withdrawal" class="action-card withdrawal">Retiro</button>
       <button type="button" id="exportBtn" class="action-card neutral">Exportar</button>
-    </section>
-
-    <section class="panel glass settings-panel" id="settingsPanel" hidden>
-      <div class="section-title"><h2>Configuración</h2><button type="button" id="closeSettingsBtn" class="text-button">Cerrar</button></div>
-
-      <details open>
-        <summary>Ajustes de la app</summary>
-        <form id="settingsForm">
-          <label class="field"><span>Nombre de la app</span><input id="settingAppName" type="text" placeholder="Yair OS" /></label>
-          <div class="two-col">
-            <label class="field"><span>Moneda</span><select id="settingCurrency"><option value="USD">USD</option><option value="MXN">MXN</option></select></label>
-            <label class="field"><span>Tema</span><select id="settingTheme"><option value="dark">Oscuro</option><option value="light">Claro</option><option value="system">Sistema</option></select></label>
-          </div>
-          <label class="field"><span>Presupuesto mensual</span><input id="settingMonthlyBudget" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></label>
-          <button class="primary-button" type="submit">Guardar ajustes</button>
-          <button class="ghost-button" id="resetSettingsBtn" type="button">Restablecer ajustes</button>
-        </form>
-      </details>
-
-      <details>
-        <summary>Memoria GPT</summary>
-        <form id="memoryForm">
-          <label class="field"><span>Categoría</span><select id="memoryCategory"><option>Finanzas</option><option>Casa</option><option>Vehículos</option><option>Trabajo</option><option>Contenido</option><option>Proyectos</option><option>Personal</option></select></label>
-          <label class="field"><span>Dato importante</span><textarea id="memoryText" placeholder="Ej. Mi prioridad de este mes es organizar finanzas y bajar gastos." required></textarea></label>
-          <button class="secondary-button" type="submit">Guardar en memoria</button>
-        </form>
-      </details>
-
-      <details>
-        <summary>Agenda y pendientes</summary>
-        <form id="taskForm">
-          <label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. lavar camioneta, pagar UFCU" required /></label>
-          <div class="two-col"><label class="field"><span>Área</span><select id="taskArea"><option>Casa</option><option>Trabajo</option><option>Vehículo</option><option>Finanzas</option><option>Contenido</option><option>Personal</option></select></label><label class="field"><span>Fecha objetivo</span><input id="taskDate" type="date" /></label></div>
-          <button class="secondary-button" type="submit">Guardar pendiente</button>
-        </form>
-        <div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div>
-      </details>
-
-      <details>
-        <summary>Asistente IA</summary>
-        <label class="field"><span>Pregunta para tu sistema</span><textarea id="aiPrompt" placeholder="Ej. analiza mis gastos y dime qué debo hacer esta semana"></textarea></label>
-        <button class="primary-button" id="askAiBtn" type="button">Preguntar a GPT</button>
-        <div id="aiAnswer" class="ai-answer empty">Configura un proxy OpenAI para usar esta función.</div>
-      </details>
-
-      <details>
-        <summary>Llaves, APIs e integraciones</summary>
-        <label class="field"><span>GitHub token local</span><input id="githubToken" type="password" placeholder="Token con Contents: read/write" /></label>
-        <button class="secondary-button" id="saveGithubConfig" type="button">Activar sync GitHub</button>
-        <button class="ghost-button" id="pullGithubData" type="button">Leer datos desde GitHub</button>
-
-        <label class="field"><span>Google Apps Script Web App URL</span><input id="googleScriptUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" /></label>
-        <button class="secondary-button" id="saveGoogleConfig" type="button">Guardar conexión Google</button>
-        <p class="helper-text">Google Apps Script escribe en Sheets, puede crear eventos en Calendar y usar Gmail cuando autorices el script.</p>
-
-        <label class="field"><span>OpenAI proxy URL</span><input id="openAiProxyUrl" type="url" placeholder="https://tu-backend.vercel.app/api/openai" /></label>
-        <button class="secondary-button" id="saveOpenAiConfig" type="button">Guardar conexión OpenAI</button>
-        <p class="helper-text">No pongas tu API key de OpenAI en esta página pública. Usa un proxy seguro.</p>
-      </details>
     </section>
 
     <section class="panel glass" id="movementPanel">
@@ -113,6 +117,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260525-02"></script>
+  <script src="app.js?v=20260525-03"></script>
 </body>
 </html>
