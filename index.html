@@ -8,17 +8,17 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Yair OS" />
   <title>Yair OS</title>
-  <link rel="manifest" href="manifest.json?v=20260524-20" />
-  <link rel="apple-touch-icon" href="icon.svg?v=20260524-20" />
-  <link rel="stylesheet" href="styles.css?v=20260524-20" />
+  <link rel="manifest" href="manifest.json?v=20260525-01" />
+  <link rel="apple-touch-icon" href="icon.svg?v=20260525-01" />
+  <link rel="stylesheet" href="styles.css?v=20260525-01" />
 </head>
 <body>
   <main class="phone-shell">
     <section class="hero-card glass">
       <div class="status-row"><span id="todayLabel">Hoy</span><span class="pill" id="syncStatus">Local</span></div>
       <div class="hero-title">
-        <div><p class="muted">Balance actual</p><h1 id="balanceAmount">$0.00</h1></div>
-        <button type="button" class="round-button" id="themeToggle" aria-label="Cambiar tema">◐</button>
+        <div><p class="muted" id="appNameLabel">Yair OS</p><h1 id="balanceAmount">$0.00</h1></div>
+        <button type="button" class="round-button" id="openSettingsBtn" aria-label="Abrir ajustes">⚙︎</button>
       </div>
       <div class="mini-grid">
         <div><span>Ingresos</span><strong id="incomeAmount">$0.00</strong></div>
@@ -32,6 +32,25 @@
       <button type="button" data-type="expense" class="action-card expense">− Gasto</button>
       <button type="button" data-type="withdrawal" class="action-card withdrawal">Retiro</button>
       <button type="button" id="exportBtn" class="action-card neutral">Exportar</button>
+    </section>
+
+    <section class="panel glass settings-panel" id="settingsPanel" hidden>
+      <div class="section-title"><h2>Ajustes</h2><button type="button" id="closeSettingsBtn" class="text-button">Cerrar</button></div>
+      <form id="settingsForm">
+        <label class="field"><span>Nombre de la app</span><input id="settingAppName" type="text" placeholder="Yair OS" /></label>
+        <div class="two-col">
+          <label class="field"><span>Moneda</span><select id="settingCurrency"><option value="USD">USD</option><option value="MXN">MXN</option></select></label>
+          <label class="field"><span>Tema</span><select id="settingTheme"><option value="dark">Oscuro</option><option value="light">Claro</option><option value="system">Sistema</option></select></label>
+        </div>
+        <label class="field"><span>Presupuesto mensual</span><input id="settingMonthlyBudget" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" /></label>
+        <div class="two-col">
+          <label class="field"><span>Vista inicial</span><select id="settingDefaultView"><option value="finances">Finanzas</option><option value="tasks">Agenda</option><option value="ai">Asistente IA</option></select></label>
+          <label class="field"><span>Modo compacto</span><select id="settingCompactMode"><option value="off">No</option><option value="on">Sí</option></select></label>
+        </div>
+        <button class="primary-button" type="submit">Guardar ajustes</button>
+        <button class="ghost-button" id="resetSettingsBtn" type="button">Restablecer ajustes</button>
+      </form>
+      <p class="helper-text">Estos ajustes se guardan en este iPhone/navegador y también se sincronizan con GitHub si tienes el sync activo.</p>
     </section>
 
     <section class="panel glass" id="movementPanel">
@@ -58,7 +77,7 @@
       </form>
     </section>
 
-    <section class="panel glass">
+    <section class="panel glass" id="taskPanel">
       <div class="section-title"><h2>Agenda</h2><span id="taskCountLabel">0 pendientes</span></div>
       <form id="taskForm">
         <label class="field"><span>Pendiente</span><input id="taskText" type="text" placeholder="Ej. lavar camioneta, pagar UFCU" required /></label>
@@ -68,7 +87,7 @@
       <div id="taskList" class="transaction-list empty">Sin pendientes todavía.</div>
     </section>
 
-    <section class="panel glass">
+    <section class="panel glass" id="aiPanel">
       <div class="section-title"><h2>Asistente IA</h2><span>OpenAI vía proxy</span></div>
       <label class="field"><span>Pregunta para tu sistema</span><textarea id="aiPrompt" placeholder="Ej. analiza mis gastos y dime qué debo hacer esta semana"></textarea></label>
       <button class="primary-button" id="askAiBtn" type="button">Preguntar a GPT</button>
@@ -95,6 +114,6 @@
       <div id="transactionList" class="transaction-list empty">Sin movimientos todavía.</div>
     </section>
   </main>
-  <script src="app.js?v=20260524-20"></script>
+  <script src="app.js?v=20260525-01"></script>
 </body>
 </html>
