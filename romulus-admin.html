@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#02040a">
+<title>Romulus Admin</title>
+<style>
+:root{--bg:#02040a;--panel:rgba(12,18,30,.86);--solid:#0b111d;--field:#111827;--text:#f8fbff;--muted:#9caabd;--line:rgba(180,210,255,.15);--blue:#168dff;--blue2:#6edcff;--soft:rgba(22,141,255,.14);--danger:#ff8f8f;--ok:#35c46a;--warn:#ffc766;--shadow:0 20px 46px rgba(0,0,0,.48);--r:24px;--rs:16px}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Google Sans",system-ui,sans-serif;background:radial-gradient(circle at 50% -10%,rgba(24,141,255,.38),transparent 24rem),linear-gradient(180deg,#02040a,#060b13 50%,#02040a);color:var(--text);padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 18px)}.app{width:min(100%,980px);margin:auto}.top{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}.brand{display:flex;gap:12px;align-items:center}.logo{width:52px;height:52px;border-radius:17px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.16),0 14px 32px rgba(0,120,255,.26)}.logo img{width:100%;height:100%;display:block}h1{margin:0;font-size:22px;letter-spacing:-.04em}.brand p{margin:4px 0 0;color:var(--muted);font-size:12px}.pill{background:var(--soft);border:1px solid var(--line);color:var(--blue2);border-radius:999px;padding:8px 10px;font-size:12px;font-weight:850}.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(24px)}.sec{padding:14px}.sec+.sec{border-top:1px solid var(--line)}.grid{display:grid;gap:10px}.setup{grid-template-columns:1fr 1fr auto}@media(max-width:760px){.setup{grid-template-columns:1fr}.top{align-items:flex-start}.pill{display:none}}label{display:block;color:var(--muted);font-size:12px;font-weight:850;margin:0 0 6px}input,select,textarea{width:100%;border:1px solid var(--line);outline:0;background:var(--field);color:var(--text);font:inherit;border-radius:14px;padding:11px 12px}textarea{min-height:80px;resize:vertical}button{border:0;min-height:44px;border-radius:14px;padding:10px 12px;font:inherit;font-weight:950;cursor:pointer}.primary{background:linear-gradient(135deg,#eaf6ff,#6edcff 38%,#168dff);color:#02040a}.ghost{background:var(--field);color:var(--text);border:1px solid var(--line)}.dangerBtn{background:rgba(255,143,143,.14);color:var(--danger);border:1px solid rgba(255,143,143,.28)}.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.tab{background:var(--panel);border:1px solid var(--line);color:var(--muted)}.tab.active{background:var(--soft);color:var(--blue2);border-color:rgba(110,220,255,.28)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.stat{padding:12px;border-radius:18px;background:var(--panel);border:1px solid var(--line)}.stat span{display:block;color:var(--muted);font-size:11px;font-weight:850}.stat strong{display:block;margin-top:3px;font-size:24px}.toolbar{display:grid;grid-template-columns:1fr 160px auto;gap:8px;margin-bottom:12px}@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}}.list{display:grid;gap:10px}.item{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:13px}.itemTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.item h3{margin:0;font-size:16px}.meta{margin:4px 0 0;color:var(--muted);font-size:12px;line-height:1.35}.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:950;border:1px solid var(--line);white-space:nowrap}.REQUESTED{color:var(--warn);background:rgba(255,199,102,.12)}.REVIEWED{color:var(--blue2);background:rgba(22,141,255,.12)}.CONFIRMED{color:var(--ok);background:rgba(53,196,106,.12)}.CANCELLED{color:var(--danger);background:rgba(255,143,143,.12)}.COMPLETED{color:#d9e4f2;background:rgba(217,228,242,.10)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{min-height:38px;font-size:12px}.split{display:grid;grid-template-columns:1fr 1fr;gap:8px}@media(max-width:760px){.split{grid-template-columns:1fr}}.modalBg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:100;align-items:flex-end}.modalBg.open{display:flex}.modal{width:min(100%,560px);max-height:88vh;overflow:auto;margin:auto auto 0;background:#07101d;border:1px solid var(--line);border-radius:26px 26px 0 0;padding:14px;box-shadow:0 -20px 44px rgba(0,0,0,.5)}.modal h2{margin:4px 0 12px}.muted{color:var(--muted);font-size:12px;line-height:1.4}.empty{text-align:center;padding:28px;color:var(--muted)}.footer{margin:12px 0;text-align:center;color:var(--muted);font-size:12px}.footer a{color:var(--blue2);text-decoration:none}.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top"><div class="brand"><div class="logo"><img src="romulus-detailing-icon.svg?v=blue-metal" alt="Romulus"></div><div><h1>Romulus Admin</h1><p>Requests · Customers · Calendar</p></div></div><span class="pill" id="connectionPill">Local mode</span></header>
+
+<section class="card">
+  <div class="sec"><p class="muted">Conecta este panel con tu Google Apps Script Web App. Mientras no haya URL, funciona con datos demo/locales para probar el flujo.</p></div>
+  <div class="sec grid setup">
+    <div><label>Apps Script Web App URL</label><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <div><label>Admin Token</label><input id="adminToken" type="password" placeholder="Tu token privado"></div>
+    <button class="primary" id="saveSettings">Guardar</button>
+  </div>
+</section>
+
+<div class="tabs">
+  <button class="tab active" data-tab="requests">Requests</button>
+  <button class="tab" data-tab="customers">Customers</button>
+  <button class="tab" data-tab="appointments">Appointments</button>
+  <button class="tab" data-tab="settings">Settings</button>
+</div>
+
+<section class="stats">
+  <div class="stat"><span>REQUESTED</span><strong id="statRequested">0</strong></div>
+  <div class="stat"><span>CONFIRMED</span><strong id="statConfirmed">0</strong></div>
+  <div class="stat"><span>CUSTOMERS</span><strong id="statCustomers">0</strong></div>
+  <div class="stat"><span>APPOINTMENTS</span><strong id="statAppointments">0</strong></div>
+</section>
+
+<section class="card" id="viewRequests">
+  <div class="sec toolbar"><input id="search" placeholder="Buscar nombre, teléfono, vehículo, servicio..."><select id="statusFilter"><option value="">Todos</option><option>REQUESTED</option><option>REVIEWED</option><option>CONFIRMED</option><option>CANCELLED</option><option>COMPLETED</option></select><button class="primary" id="refreshBtn">Refresh</button></div>
+  <div class="sec list" id="requestsList"></div>
+</section>
+
+<section class="card hidden" id="viewCustomers"><div class="sec list" id="customersList"></div></section>
+<section class="card hidden" id="viewAppointments"><div class="sec list" id="appointmentsList"></div></section>
+
+<section class="card hidden" id="viewSettings">
+  <div class="sec"><h3 style="margin:0 0 8px">Cómo conectar Sheets</h3><p class="muted">1. Abre el archivo <b>romulus-apps-script.gs</b> del repo.<br>2. Cópialo en Google Apps Script.<br>3. Pega el ID de tu Google Sheet.<br>4. Crea Script Property <b>ADMIN_TOKEN</b>.<br>5. Ejecuta <b>setupSheets()</b> una vez.<br>6. Deploy como Web App y pega el URL arriba.</p></div>
+  <div class="sec"><button class="dangerBtn" id="clearLocal">Borrar datos locales/demo</button></div>
+</section>
+
+<p class="footer"><a href="romulus-detailing.html?v=admin-linked">Abrir app pública</a> · Romulus Detailing</p>
+</main>
+
+<div class="modalBg" id="modalBg"><div class="modal"><h2 id="modalTitle">Confirmar cita</h2><div id="modalBody"></div></div></div>
+
+<script>
+var state={tab:'requests',requests:[],customers:[],appointments:[],selected:null};
+var demo={requests:[{'Request ID':'REQ-DEMO-001','Created At':new Date().toISOString(),'Status':'REQUESTED','Customer Name':'John Smith','Phone':'269-000-0000','Email':'','Vehicle':'2021 Silverado Crew Cab','Service':'A-1 Monthly New Car Care','Vehicle Type':'Truck / Large SUV','Estimated Total':'$295+','Extras':'Pet hair +$45','Notes':'Dog hair and light salt. Wants evening appointment.','Preferred Date':'2026-06-18','Preferred Time':'6:00 PM','Second Date':'2026-06-19','Second Time':'6:00 PM','Location Type':'Drop-off','Address':'','FAQ Accepted':'YES','Admin Notes':''}],customers:[],appointments:[]};
+function el(id){return document.getElementById(id)}
+function save(){localStorage.setItem('romulusAdminState',JSON.stringify({requests:state.requests,customers:state.customers,appointments:state.appointments}))}
+function loadLocal(){var s=localStorage.getItem('romulusAdminState');if(s){try{var x=JSON.parse(s);state.requests=x.requests||[];state.customers=x.customers||[];state.appointments=x.appointments||[];return}catch(e){}}state.requests=demo.requests.slice();state.customers=[];state.appointments=[];save()}
+function cfg(){return{url:localStorage.getItem('romulusApiUrl')||'',token:localStorage.getItem('romulusAdminToken')||''}}
+function setCfg(){el('apiUrl').value=cfg().url;el('adminToken').value=cfg().token;el('connectionPill').textContent=cfg().url?'Connected URL saved':'Local mode'}
+async function apiGet(){var c=cfg();if(!c.url||!c.token){loadLocal();render();return}el('connectionPill').textContent='Loading...';var r=await fetch(c.url+'?action=list&token='+encodeURIComponent(c.token));var j=await r.json();if(!j.ok)throw new Error(j.error||'API error');state.requests=j.data.requests||[];state.customers=j.data.customers||[];state.appointments=j.data.appointments||[];el('connectionPill').textContent='Connected';render()}
+async function apiPost(action,payload){var c=cfg();if(!c.url||!c.token){localUpdate(action,payload);render();return}var r=await fetch(c.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:c.token,action:action,payload:payload})});var j=await r.json();if(!j.ok)throw new Error(j.error||'API error');await apiGet()}
+function localUpdate(action,p){if(action==='updateStatus'){var req=state.requests.find(function(x){return x['Request ID']===p.requestId});if(req){req.Status=p.status;req['Admin Notes']=p.adminNotes||req['Admin Notes']||'';req['Updated At']=new Date().toISOString()}}if(action==='confirmAppointment'){var req=state.requests.find(function(x){return x['Request ID']===p.requestId});if(req){req.Status='CONFIRMED';req['Calendar Event ID']='LOCAL-CALENDAR';req['Admin Notes']=p.adminNotes||'';state.appointments.unshift({'Appointment ID':'APT-LOCAL-'+Date.now(),'Request ID':p.requestId,'Created At':new Date().toISOString(),'Customer Name':req['Customer Name'],'Phone':req.Phone,'Vehicle':req.Vehicle,'Service':req.Service,'Start Time':p.startTime,'End Time':p.endTime,'Status':'CONFIRMED','Calendar Event ID':'LOCAL-CALENDAR','Price Confirmed':p.priceConfirmed,'Deposit Paid':p.depositPaid||'','Admin Notes':p.adminNotes||''})}}save()}
+function render(){renderStats();renderRequests();renderCustomers();renderAppointments();showTab(state.tab)}
+function renderStats(){var req=state.requests.filter(function(x){return String(x.Status)==='REQUESTED'}).length;var conf=state.requests.filter(function(x){return String(x.Status)==='CONFIRMED'}).length;el('statRequested').textContent=req;el('statConfirmed').textContent=conf;el('statCustomers').textContent=state.customers.length;el('statAppointments').textContent=state.appointments.length}
+function cardStatus(s){return '<span class="badge '+(s||'REQUESTED')+'">'+(s||'REQUESTED')+'</span>'}
+function safe(x){return String(x||'').replace(/[&<>]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function renderRequests(){var q=el('search').value.toLowerCase(),f=el('statusFilter').value;var arr=state.requests.filter(function(r){var blob=JSON.stringify(r).toLowerCase();return(!q||blob.indexOf(q)>-1)&&(!f||String(r.Status)===f)});el('requestsList').innerHTML=arr.length?arr.map(function(r){var id=safe(r['Request ID']);return '<div class="item"><div class="itemTop"><div><h3>'+safe(r['Customer Name']||'No name')+'</h3><p class="meta">'+safe(r.Phone)+' · '+safe(r.Vehicle)+'<br>'+safe(r.Service)+' · '+safe(r['Estimated Total'])+'<br>Preferred: '+safe(r['Preferred Date'])+' '+safe(r['Preferred Time'])+'</p></div>'+cardStatus(safe(r.Status))+'</div><p class="meta"><b>Notes:</b> '+safe(r.Notes)+'</p><div class="actions"><button class="ghost" onclick="markReviewed(\''+id+'\')">Reviewed</button><button class="primary" onclick="openConfirm(\''+id+'\')">Confirmar cita</button><button class="dangerBtn" onclick="changeStatus(\''+id+'\',\'CANCELLED\')">Cancelar</button><button class="ghost" onclick="changeStatus(\''+id+'\',\'COMPLETED\')">Completed</button></div></div>'}).join(''):'<div class="empty">No hay requests.</div>'}
+function renderCustomers(){el('customersList').innerHTML=state.customers.length?state.customers.map(function(c){return '<div class="item"><div class="itemTop"><div><h3>'+safe(c.Name||c['Customer Name']||'Customer')+'</h3><p class="meta">'+safe(c.Phone)+' · '+safe(c.Email)+'<br>Vehicles: '+safe(c.Vehicles||c.Vehicle)+'<br>Notes: '+safe(c.Notes)+'</p></div></div></div>'}).join(''):'<div class="empty">Los clientes aparecerán cuando conectes Sheets o recibas requests.</div>'}
+function renderAppointments(){el('appointmentsList').innerHTML=state.appointments.length?state.appointments.map(function(a){return '<div class="item"><div class="itemTop"><div><h3>'+safe(a['Customer Name'])+'</h3><p class="meta">'+safe(a.Vehicle)+' · '+safe(a.Service)+'<br>'+safe(a['Start Time'])+' → '+safe(a['End Time'])+'<br>Price: '+safe(a['Price Confirmed'])+'</p></div>'+cardStatus(safe(a.Status))+'</div></div>'}).join(''):'<div class="empty">No hay citas confirmadas.</div>'}
+function showTab(tab){state.tab=tab;['requests','customers','appointments','settings'].forEach(function(t){el('view'+cap(t)).classList.toggle('hidden',t!==tab);document.querySelector('[data-tab="'+t+'"]').classList.toggle('active',t===tab)})}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function findReq(id){return state.requests.find(function(r){return String(r['Request ID'])===String(id)})}
+async function markReviewed(id){await changeStatus(id,'REVIEWED')}
+async function changeStatus(id,status){try{await apiPost('updateStatus',{requestId:id,status:status,adminNotes:'Updated from Romulus Admin'});closeModal()}catch(e){alert(e.message)}}
+function openConfirm(id){var r=findReq(id);if(!r)return;state.selected=r;var startGuess='';var d=r['Preferred Date'];if(d){startGuess=d+'T18:00'}var html='<p class="muted">'+safe(r['Customer Name'])+' · '+safe(r.Vehicle)+' · '+safe(r.Service)+'</p><div class="grid"><div class="split"><div><label>Inicio</label><input id="mStart" type="datetime-local" value="'+safe(startGuess)+'"></div><div><label>Duración minutos</label><input id="mDuration" type="number" value="180"></div></div><div class="split"><div><label>Precio confirmado</label><input id="mPrice" placeholder="$295+"></div><div><label>Depósito pagado</label><input id="mDeposit" placeholder="No / $50 / Zelle"></div></div><div><label>Notas admin</label><textarea id="mNotes" placeholder="Notas internas o condiciones de confirmación"></textarea></div><button class="primary" onclick="confirmSelected()">Crear cita en Calendar / Confirmar</button><button class="ghost" onclick="closeModal()">Cerrar</button></div>';el('modalTitle').textContent='Confirmar cita';el('modalBody').innerHTML=html;el('modalBg').classList.add('open')}
+async function confirmSelected(){try{var r=state.selected;if(!r)return;var s=el('mStart').value;if(!s){alert('Selecciona fecha y hora de inicio.');return}var start=new Date(s);var end=new Date(start.getTime()+Number(el('mDuration').value||180)*60000);await apiPost('confirmAppointment',{requestId:r['Request ID'],startTime:start.toISOString(),endTime:end.toISOString(),priceConfirmed:el('mPrice').value,depositPaid:el('mDeposit').value,adminNotes:el('mNotes').value,address:r.Address||''});closeModal()}catch(e){alert(e.message)}}
+function closeModal(){el('modalBg').classList.remove('open')}
+el('saveSettings').onclick=function(){localStorage.setItem('romulusApiUrl',el('apiUrl').value.trim());localStorage.setItem('romulusAdminToken',el('adminToken').value.trim());setCfg();apiGet().catch(function(e){alert(e.message);loadLocal();render()})};
+el('refreshBtn').onclick=function(){apiGet().catch(function(e){alert(e.message);loadLocal();render()})};
+el('search').oninput=renderRequests;el('statusFilter').onchange=renderRequests;
+document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){showTab(this.dataset.tab)}});
+el('clearLocal').onclick=function(){localStorage.removeItem('romulusAdminState');loadLocal();render()};
+el('modalBg').onclick=function(e){if(e.target===el('modalBg'))closeModal()};
+setCfg();loadLocal();apiGet().catch(function(){loadLocal();render()});
+</script>
+</body>
+</html>
