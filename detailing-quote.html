@@ -12,7 +12,7 @@
   <style>
     :root {
       --bg: #f7f2ea;
-      --surface: rgba(255, 255, 255, .76);
+      --surface: rgba(255, 255, 255, .78);
       --surface-solid: #ffffff;
       --surface-2: #f0ebe3;
       --text: #171411;
@@ -21,6 +21,8 @@
       --primary: #9b6a20;
       --primary-2: #fff3d6;
       --primary-text: #ffffff;
+      --warning: #8a5200;
+      --danger: #b3261e;
       --shadow: 0 18px 42px rgba(44, 35, 24, .14);
       --radius: 26px;
       --radius-sm: 18px;
@@ -29,7 +31,7 @@
     @media (prefers-color-scheme: dark) {
       :root {
         --bg: #10100f;
-        --surface: rgba(31, 31, 30, .78);
+        --surface: rgba(31, 31, 30, .80);
         --surface-solid: #1c1c1b;
         --surface-2: #262522;
         --text: #f2f0eb;
@@ -38,6 +40,8 @@
         --primary: #e8b84a;
         --primary-2: rgba(232, 184, 74, .16);
         --primary-text: #1f1605;
+        --warning: #ffd47a;
+        --danger: #ffb4ab;
         --shadow: 0 18px 42px rgba(0,0,0,.34);
       }
     }
@@ -114,15 +118,20 @@
       white-space: nowrap;
     }
 
-    .live {
-      font-size: 12px;
-      color: var(--primary);
-      background: var(--primary-2);
-      border: 1px solid rgba(155,106,32,.18);
-      padding: 7px 10px;
+    .roundBtn {
+      width: 42px;
+      height: 42px;
       border-radius: 999px;
-      font-weight: 900;
-      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--primary);
+      font-weight: 950;
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .totalCard {
@@ -273,7 +282,7 @@
     }
 
     textarea {
-      min-height: 82px;
+      min-height: 84px;
       resize: vertical;
     }
 
@@ -355,7 +364,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
       padding: 14px 16px 16px;
       border-top: 1px solid var(--line);
@@ -389,6 +398,35 @@
       background: var(--surface-2);
       color: var(--text);
       border: 1px solid var(--line);
+    }
+
+    .warning {
+      background: var(--primary-2);
+      color: var(--primary);
+      border: 1px solid rgba(155,106,32,.25);
+    }
+
+    .ack {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 11px;
+      border-radius: 16px;
+      background: var(--surface-solid);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .ack input {
+      width: 22px;
+      height: 22px;
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
+      accent-color: var(--primary);
     }
 
     .hint {
@@ -430,13 +468,30 @@
       content: "Ocultar";
     }
 
-    .quote {
+    .quote, .policies {
       border-top: 1px solid var(--line);
       padding: 13px 14px 14px;
-      white-space: pre-wrap;
       color: var(--text);
       font-size: 13px;
       line-height: 1.42;
+    }
+
+    .quote {
+      white-space: pre-wrap;
+    }
+
+    .policies ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .policies li {
+      margin: 7px 0;
+    }
+
+    .dangerText {
+      color: var(--danger);
+      font-weight: 900;
     }
 
     .footer {
@@ -453,10 +508,9 @@
     }
 
     @media (max-width: 390px) {
-      .chips, .actions { grid-template-columns: 1fr; }
+      .chips { grid-template-columns: 1fr; }
       .brand h1 { font-size: 18px; }
       .price { font-size: 50px; }
-      .live { display: none; }
     }
   </style>
 </head>
@@ -471,20 +525,20 @@
           <p>Quick quote</p>
         </div>
       </div>
-      <div class="live">Total en vivo</div>
+      <button type="button" class="roundBtn" id="policyTopBtn" aria-label="Ver políticas">i</button>
     </header>
 
     <section class="totalCard">
       <div class="pricePanel">
         <p class="priceLabel">Total estimado</p>
-        <p class="price" id="price">$175+</p>
-        <p class="fine">Este número cambia en vivo al seleccionar servicio, tipo de coche y extras.</p>
+        <p class="price" id="price">$195+</p>
+        <p class="fine">El total se actualiza automáticamente. Precio final sujeto a fotos, inspección y condición real.</p>
       </div>
 
       <div class="breakdown">
         <div>
           <span>Servicio</span>
-          <strong id="basePrice">$175</strong>
+          <strong id="basePrice">$195</strong>
         </div>
         <div>
           <span>Tamaño</span>
@@ -544,28 +598,49 @@
         <p class="section-title">Extras</p>
 
         <div class="chips">
-          <label class="chip"><input class="extra" type="checkbox" value="25" data-label="Pet hair"> Pet hair +$25</label>
-          <label class="chip"><input class="extra" type="checkbox" value="35" data-label="Heavy stains"> Heavy stains +$35</label>
-          <label class="chip"><input class="extra" type="checkbox" value="30" data-label="Salt buildup"> Salt buildup +$30</label>
-          <label class="chip"><input class="extra" type="checkbox" value="40" data-label="Smoke / odor"> Smoke / odor +$40</label>
+          <label class="chip"><input class="extra" type="checkbox" value="45" data-label="Pet hair"> Pet hair +$45</label>
+          <label class="chip"><input class="extra" type="checkbox" value="60" data-label="Heavy stains"> Heavy stains +$60</label>
+          <label class="chip"><input class="extra" type="checkbox" value="55" data-label="Salt buildup"> Salt buildup +$55</label>
+          <label class="chip"><input class="extra" type="checkbox" value="75" data-label="Smoke / odor"> Smoke / odor +$75</label>
         </div>
 
         <div class="field" style="margin-top: 11px;">
           <label for="notes">Notas para la cotización</label>
-          <textarea id="notes" placeholder="Ej. sal en alfombras, pelo de perro, manchas en asientos..."></textarea>
+          <textarea id="notes" placeholder="Ej. sal en alfombras, pelo de perro, manchas en asientos, olor, fotos disponibles..."></textarea>
         </div>
+
+        <label class="ack">
+          <input id="ack" type="checkbox">
+          <span>Entiendo que este precio es estimado. El precio final puede cambiar después de revisar fotos o inspeccionar el vehículo. No se garantiza remover 100% manchas, olores, rayas o daños previos.</span>
+        </label>
       </div>
 
       <div class="actions">
-        <button type="button" class="primary" id="refreshBtn">Actualizar total</button>
-        <button type="button" class="secondary" id="smsButton">Enviar datos por SMS</button>
+        <button type="button" class="primary" id="smsButton">Enviar datos por SMS</button>
+        <button type="button" class="warning" id="customButton">Quiero cotización personalizada</button>
       </div>
-      <p class="hint">El SMS va dirigido a Yair con la información capturada. La página no lo envía sola; se abre Mensajes y tú presionas Enviar.</p>
+      <p class="hint">El SMS va dirigido a Yair con la información capturada. La página no envía mensajes sola; se abre Mensajes y el cliente presiona Enviar.</p>
     </section>
 
-    <details>
+    <details id="previewDetails">
       <summary>Vista previa del mensaje SMS</summary>
       <div class="quote" id="quote"></div>
+    </details>
+
+    <details id="policyDetails">
+      <summary>Políticas importantes</summary>
+      <div class="policies">
+        <ul>
+          <li><strong>Starting price only:</strong> todo precio mostrado es estimado y puede cambiar por tamaño, condición, acceso, suciedad, sal, pelo de mascota, manchas, olor o servicios adicionales.</li>
+          <li><strong>Fotos/inspección:</strong> la cotización final se confirma después de revisar fotos o inspeccionar el vehículo.</li>
+          <li><strong>No garantía absoluta:</strong> manchas, olores, rayas, oxidación, clear coat dañado, plásticos viejos, tint, telas o daños previos pueden mejorar sin desaparecer 100%.</li>
+          <li><strong>Objetos personales:</strong> el cliente debe retirar dinero, documentos, armas, herramientas, child seats, electrónicos y objetos de valor. No se asume responsabilidad por artículos dejados dentro del vehículo.</li>
+          <li><strong>Daño previo:</strong> no se asume responsabilidad por desgaste, piezas flojas, clips rotos, clear coat quemado, pintura repintada sensible, molduras sueltas o accesorios aftermarket ya comprometidos.</li>
+          <li><strong>Biohazard:</strong> moho, sangre, vómito, orina, heces, plagas, inundación o contaminación biológica requieren revisión personalizada y pueden ser rechazados.</li>
+          <li><strong>Depósito:</strong> trabajos grandes o citas reservadas pueden requerir depósito no reembolsable aplicado al total.</li>
+          <li><strong class="dangerText">Confirmación:</strong> no hay cita confirmada hasta que Yair confirme precio, fecha, hora y condiciones por mensaje.</li>
+        </ul>
+      </div>
     </details>
 
     <p class="footer">
@@ -576,36 +651,37 @@
 
   <script>
     var phone = "12693385171";
+    var customMode = false;
 
     var services = {
       interior: {
         fullName: "“My car is dirty inside” — Interior Reset",
-        prices: { sedan: 175, small: 200, truck: 225, van: 250 },
+        prices: { sedan: 195, small: 225, truck: 255, van: 285 },
         includes: "Deep vacuum, dashboard, console, door panels, cup holders, plastics, mats, carpets, seats and interior glass."
       },
       deep: {
         fullName: "“I have kids / dog smell / stains” — Deep Interior Rescue",
-        prices: { sedan: 225, small: 250, truck: 275, van: 300 },
+        prices: { sedan: 260, small: 295, truck: 335, van: 375 },
         includes: "Deep interior cleaning, shampoo/extraction, stain attention, pet hair/odor attention, seats, carpets, mats and cargo area."
       },
       full: {
         fullName: "“Full detail” — Complete Inside & Out",
-        prices: { sedan: 300, small: 350, truck: 400, van: 400 },
+        prices: { sedan: 325, small: 375, truck: 425, van: 475 },
         includes: "Interior cleaning plus exterior wash, wheels, tires, door jambs, glass inside/out and basic wax or sealant."
       },
       shine: {
         fullName: "“Can you make it shiny again?” — Shine & Paint Enhancement",
-        prices: { sedan: 95, small: 120, truck: 145, van: 170 },
-        includes: "Exterior wash, wheels, tires, glass, clay bar if needed and wax/sealant. Paint correction or heavy scratch removal requires separate quote."
+        prices: { sedan: 275, small: 325, truck: 375, van: 425 },
+        includes: "Exterior wash, paint decontamination, clay bar if needed, one-step gloss enhancement/polish and wax/sealant. Heavy scratches require separate quote."
       },
       ceramic: {
         fullName: "“I want protection” — Ceramic Protection Package",
-        prices: { sedan: 650, small: 700, truck: 800, van: 850 },
-        includes: "Exterior detail, paint decontamination, clay bar, paint prep/correction and ceramic coating application."
+        prices: { sedan: 750, small: 850, truck: 950, van: 1100 },
+        includes: "Exterior detail, paint decontamination, clay bar, paint prep/correction and ceramic coating application. Final quote depends on paint condition."
       },
       salt: {
         fullName: "“Before winter / after winter” — Michigan Salt Recovery",
-        prices: { sedan: 220, small: 260, truck: 310, van: 350 },
+        prices: { sedan: 260, small: 310, truck: 360, van: 420 },
         includes: "Salt cleanup from mats/carpets, heavy exterior wash, wheels, wheel wells, door jambs and basic protection."
       }
     };
@@ -668,7 +744,7 @@
       };
     }
 
-    function buildSmsMessage() {
+    function buildSmsMessage(isCustom) {
       var d = getData();
       var extrasText = "None";
 
@@ -678,6 +754,18 @@
           list.push(d.extras[i].label + " +$" + d.extras[i].price);
         }
         extrasText = list.join(", ");
+      }
+
+      if (isCustom) {
+        return "Custom Detailing Quote Request\n\n" +
+          "Customer: " + (d.name || "Not provided") + "\n" +
+          "Vehicle: " + (d.vehicle || "Not provided") + "\n" +
+          "Requested service: Custom quote / Yair review needed\n" +
+          "Selected service: " + d.service.fullName + "\n" +
+          "Vehicle type: " + d.size + "\n" +
+          "Extras/condition: " + extrasText + "\n\n" +
+          "Notes: " + (d.notes || "None") + "\n\n" +
+          "Customer understands final price depends on photos, inspection, vehicle condition and approval by Yair.";
       }
 
       return "New Detailing Quote Request\n\n" +
@@ -692,13 +780,14 @@
         "Extras/condition: " + extrasText + "\n\n" +
         "Notes: " + (d.notes || "None") + "\n\n" +
         "Includes: " + d.service.includes + "\n\n" +
-        "Final price depends on photos and actual condition.";
+        "Acknowledgement: Customer understands this is an estimate only. Final price depends on photos, inspection and actual condition. No 100% stain/odor/scratch removal guarantee.";
     }
 
     function updateTotal() {
       var d = getData();
-      var message = buildSmsMessage();
+      var message = buildSmsMessage(false);
 
+      customMode = false;
       byId("price").textContent = money(d.total) + "+";
       byId("basePrice").textContent = money(d.sedanBase);
       byId("sizePrice").textContent = d.sizeExtra > 0 ? "+" + money(d.sizeExtra) : "$0";
@@ -707,26 +796,25 @@
       byId("servicePreview").innerHTML = "<strong>" + d.service.fullName + "</strong><span>" + d.service.includes + "</span>";
     }
 
-    function animatePrice() {
-      var el = byId("price");
-      if (el && el.animate) {
-        el.animate(
-          [
-            { transform: "scale(1)", opacity: 1 },
-            { transform: "scale(1.05)", opacity: .82 },
-            { transform: "scale(1)", opacity: 1 }
-          ],
-          { duration: 260, easing: "ease-out" }
-        );
-      }
+    function showCustomQuote() {
+      var d = getData();
+      customMode = true;
+      byId("price").textContent = "Custom";
+      byId("basePrice").textContent = "Review";
+      byId("sizePrice").textContent = "Photos";
+      byId("extrasPrice").textContent = "Yair";
+      byId("quote").textContent = buildSmsMessage(true);
+      byId("previewDetails").open = true;
     }
 
-    function sendSmsToYair() {
-      updateTotal();
-      var message = buildSmsMessage();
-      var encoded = encodeURIComponent(message);
+    function sendSmsToYair(isCustom) {
+      if (!byId("ack").checked) {
+        alert("Antes de enviar, marca la casilla de aceptación de precio estimado y políticas.");
+        return;
+      }
 
-      // iPhone: sms:number&body=message is usually the most reliable.
+      var message = buildSmsMessage(!!isCustom);
+      var encoded = encodeURIComponent(message);
       window.location.href = "sms:" + phone + "&body=" + encoded;
     }
 
@@ -736,16 +824,23 @@
         elements[i].addEventListener("input", updateTotal);
         elements[i].addEventListener("change", updateTotal);
         elements[i].addEventListener("keyup", updateTotal);
-        elements[i].addEventListener("click", updateTotal);
+        elements[i].addEventListener("click", function(e) {
+          if (e.target.id !== "customButton") updateTotal();
+        });
       }
 
-      byId("refreshBtn").addEventListener("click", function() {
-        updateTotal();
-        animatePrice();
+      byId("smsButton").addEventListener("click", function() {
+        sendSmsToYair(false);
       });
 
-      byId("smsButton").addEventListener("click", function() {
-        sendSmsToYair();
+      byId("customButton").addEventListener("click", function() {
+        showCustomQuote();
+        sendSmsToYair(true);
+      });
+
+      byId("policyTopBtn").addEventListener("click", function() {
+        byId("policyDetails").open = true;
+        byId("policyDetails").scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
       updateTotal();
