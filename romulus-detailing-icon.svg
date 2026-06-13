@@ -1,39 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Romulus Detailing app icon">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#111111"/>
-      <stop offset="0.42" stop-color="#24201a"/>
-      <stop offset="1" stop-color="#b57a24"/>
+      <stop offset="0" stop-color="#02040a"/>
+      <stop offset="0.48" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#001a38"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff3c4"/>
-      <stop offset="0.45" stop-color="#e2ad45"/>
-      <stop offset="1" stop-color="#8d5d19"/>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.18" stop-color="#d9e4f2"/>
+      <stop offset="0.48" stop-color="#6f7d8d"/>
+      <stop offset="0.72" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#222b36"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#000" flood-opacity="0.42"/>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7fd6ff"/>
+      <stop offset="0.35" stop-color="#0078ff"/>
+      <stop offset="1" stop-color="#001b4c"/>
+    </linearGradient>
+    <linearGradient id="darkMetal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f1722"/>
+      <stop offset="0.5" stop-color="#1f2937"/>
+      <stop offset="1" stop-color="#020409"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="32" stdDeviation="30" flood-color="#000" flood-opacity="0.62"/>
+    </filter>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="9" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <rect width="1024" height="1024" rx="224" fill="url(#bg)"/>
-  <circle cx="220" cy="180" r="220" fill="#ffffff" opacity="0.08"/>
-  <circle cx="845" cy="860" r="310" fill="#ffffff" opacity="0.07"/>
+  <rect width="1024" height="1024" rx="225" fill="url(#bg)"/>
+  <rect x="48" y="48" width="928" height="928" rx="190" fill="none" stroke="url(#metal)" stroke-width="20" opacity="0.94"/>
+  <rect x="76" y="76" width="872" height="872" rx="170" fill="none" stroke="#0078ff" stroke-width="5" opacity="0.55"/>
+  <path d="M140 104h744" stroke="#4cc8ff" stroke-width="10" stroke-linecap="round" opacity="0.55" filter="url(#glow)"/>
+  <path d="M172 922h680" stroke="#087dff" stroke-width="7" stroke-linecap="round" opacity="0.65" filter="url(#glow)"/>
 
   <g filter="url(#shadow)">
-    <path d="M212 592c16-78 58-137 125-177 33-20 76-32 128-36l118-9c48-4 90 9 125 37l88 71c22 18 37 42 43 70l10 44H212z" fill="url(#gold)"/>
-    <path d="M307 542c22-43 55-75 99-95 26-12 60-20 101-24l73-6c36-3 67 7 93 29l82 70c8 7 14 15 19 26H307z" fill="#111111" opacity="0.82"/>
-    <path d="M178 600h692c31 0 56 25 56 56v20c0 31-25 56-56 56H178c-31 0-56-25-56-56v-20c0-31 25-56 56-56z" fill="#f2c15d"/>
-    <path d="M185 625h678c18 0 32 14 32 32v8c0 18-14 32-32 32H185c-18 0-32-14-32-32v-8c0-18 14-32 32-32z" fill="#171411" opacity="0.9"/>
-    <circle cx="306" cy="720" r="82" fill="#171411"/>
-    <circle cx="306" cy="720" r="38" fill="#f2c15d"/>
-    <circle cx="718" cy="720" r="82" fill="#171411"/>
-    <circle cx="718" cy="720" r="38" fill="#f2c15d"/>
-    <path d="M182 566c72-14 135-46 188-94" fill="none" stroke="#fff1bd" stroke-width="22" stroke-linecap="round" opacity="0.92"/>
-    <path d="M698 343c76 39 125 91 148 156" fill="none" stroke="#fff1bd" stroke-width="22" stroke-linecap="round" opacity="0.82"/>
+    <path d="M250 205h354c124 0 216 79 216 191 0 90-55 157-142 182l156 194H657L524 599H392v173H250V205z" fill="url(#metal)"/>
+    <path d="M394 324h194c52 0 88 31 88 75 0 45-36 76-88 76H394V324z" fill="#05070c"/>
+    <path d="M245 205h135c-68 69-105 148-113 238-7 81 12 164 58 249H205c-53-164-40-323 40-487z" fill="url(#blue)" opacity="0.98"/>
+    <path d="M285 238c-44 85-61 173-51 264 8 73 31 137 69 192" fill="none" stroke="#67d9ff" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <path d="M155 671c29-40 77-72 143-97 55-21 121-34 197-41 85-8 161 1 230 28 52 21 95 51 129 90 21 24 13 44-19 44H180c-28 0-39-9-25-24z" fill="url(#darkMetal)"/>
+    <path d="M205 644c67-53 159-83 278-92 90-7 163 4 218 32 36 18 65 39 87 63H205z" fill="#05070c"/>
+    <path d="M206 649c90-23 175-37 253-42 109-7 212 5 309 35" fill="none" stroke="#f9fbff" stroke-width="13" stroke-linecap="round" opacity="0.88"/>
+    <path d="M223 656c-23 12-39 28-48 49h694c-10-23-28-39-55-49H223z" fill="url(#metal)"/>
+    <circle cx="309" cy="705" r="64" fill="#020409"/>
+    <circle cx="309" cy="705" r="26" fill="url(#metal)"/>
+    <circle cx="718" cy="705" r="64" fill="#020409"/>
+    <circle cx="718" cy="705" r="26" fill="url(#metal)"/>
+    <path d="M162 671c45-18 81-22 108-12" stroke="#0096ff" stroke-width="13" stroke-linecap="round" opacity="0.96" filter="url(#glow)"/>
+    <circle cx="158" cy="668" r="17" fill="#79e2ff" filter="url(#glow)"/>
   </g>
 
   <g>
-    <text x="512" y="266" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="118" font-weight="900" fill="#fff3c4" letter-spacing="-8">R</text>
-    <text x="512" y="330" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif" font-size="48" font-weight="800" fill="#fff3c4" opacity="0.9" letter-spacing="6">DETAILING</text>
+    <text x="512" y="855" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="700" fill="url(#metal)" letter-spacing="22">ROMULUS</text>
+    <text x="512" y="920" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="800" fill="#168dff" letter-spacing="18">DETAILING</text>
   </g>
 </svg>
