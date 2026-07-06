@@ -1,0 +1,73 @@
+openapi: 3.1.0
+info:
+  title: Body RO Tracker API
+  version: 1.0.0
+  description: API para que el GPT personalizado cree o actualice ROs en Google Sheets mediante Apps Script.
+servers:
+  - url: https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+paths:
+  /:
+    post:
+      operationId: crear_o_actualizar_ro
+      summary: Crea o actualiza un RO de enderezado/reparación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - apiKey
+                - action
+                - ro_number
+                - vehicle
+              properties:
+                apiKey:
+                  type: string
+                action:
+                  type: string
+                  enum: [upsert_ro]
+                ro_number:
+                  type: string
+                vehicle:
+                  type: string
+                damage_area:
+                  type: string
+                status:
+                  type: string
+                  enum: [intacto, revision, aprobado, proceso, piezas, pintura, armado, entregado]
+                assembly_hold:
+                  type: string
+                  enum: ['', piezas, suplemento]
+                body_hours_estimated:
+                  type: number
+                body_hours_week:
+                  type: number
+                notes:
+                  type: string
+                checks:
+                  type: array
+                  items:
+                    type: integer
+                materials:
+                  type: array
+                  items:
+                    type: string
+                history:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  ro_number:
+                    type: string
+                  error:
+                    type: string
