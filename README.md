@@ -1,41 +1,53 @@
-# Finanzas SZR
+# Finanzas SZR / Yair OS
 
-Una aplicación web PWA (Progressive Web App) para gestionar finanzas personales en tu iPhone o dispositivo móvil.
+Repositorio de apps web PWA para uso personal.
 
-## Características
+## Apps
 
-✨ **Seguimiento de movimientos** - Registra ingresos y gastos fácilmente
-📊 **Análisis de balance** - Ve tu balance actual, ingresos totales y gastos
-🎯 **Metas de ahorro** - Define metas financieras y monitorea tu progreso
-🌙 **Tema oscuro/claro** - Cambia el tema según tu preferencia
-💾 **Datos locales** - Toda la información se guarda en tu dispositivo
-📱 **Diseño responsive** - Optimizado para iPhone y dispositivos móviles
-📥 **Exportar CSV** - Descarga tus movimientos en formato CSV
+### Finanzas / Yair OS
 
-## Cómo usar
+Aplicación web PWA para gestionar finanzas personales, pendientes, memoria GPT e integraciones.
 
-### En tu iPhone
-1. Abre Safari
-2. Ve a: https://romuloyair-lang.github.io/Finanzas-/
-3. Toca el botón Compartir (cuadro con flecha)
-4. Selecciona "Añadir a pantalla de inicio"
-5. ¡Listo! Tendrás un acceso rápido como si fuera una app nativa
+URL principal:
 
-### Funcionalidades
-- **Nuevo movimiento**: Selecciona si es ingreso o gasto, añade monto, descripción y categoría
-- **Metas**: Define una meta, la cantidad objetivo y cuánto llevas ahorrado
-- **Exportar**: Descarga todos tus movimientos en CSV para análisis externo
-- **Limpiar**: Borra todos los movimientos registrados
+`https://romuloyair-lang.github.io/Finanzas-/`
+
+### Body RO Tracker
+
+Aplicación para tablet enfocada en enderezado y reparación:
+
+- ROs actuales
+- ROs terminados
+- Estados del coche
+- Armado esperando piezas / suplemento
+- Horas semanales por RO
+- Checklist body
+- Hardware y materiales
+- Sin precios y sin procesos de pintura
+- Integración opcional con Google Sheets + Apps Script
+
+URL cuando esté publicado en GitHub Pages:
+
+`https://romuloyair-lang.github.io/Finanzas-/body-ro/`
+
+Documentación:
+
+`body-ro/README.md`
+
+Backend Apps Script:
+
+`body-ro/apps-script/Code.gs`
+
+Schema base para Custom GPT Action:
+
+`body-ro/apps-script/openapi.yaml`
 
 ## Requisitos
-- Navegador web moderno (Safari, Chrome, Firefox)
+
+- Navegador web moderno
 - LocalStorage habilitado
+- Para sincronización: Google Sheets + Apps Script desplegado como Web App
 
 ## Privacidad
-Todos tus datos se guardan **localmente en tu dispositivo**. No se envía información a ningún servidor.
 
-## Desarrollado con
-- HTML5
-- CSS3 (Glassmorphism)
-- JavaScript vanilla
-- PWA (Web App Manifest)
+La app funciona en modo local sin nube. Para sincronización, los datos se guardan en una Google Sheet propia mediante Apps Script. No publiques tu API key privada en GitHub.
