@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: Body RO Tracker API
+  version: 1.1.0
+  description: API para que un GPT personalizado transcriba fotos de ROs y cree o actualice ROs en Google Sheets mediante Apps Script.
+servers:
+  - url: https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+paths:
+  /:
+    post:
+      operationId: upsertBodyRoFromPhoto
+      summary: Crear o actualizar un RO desde una foto transcrita por GPT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - apiKey
+                - action
+                - ro_number
+                - vehicle
+              properties:
+                apiKey:
+                  type: string
+                  description: Clave privada configurada en Apps Script.
+                action:
+                  type: string
+                  enum: [upsert_ro]
+                  default: upsert_ro
+                ro_number:
+                  type: string
+                  description: Numero de RO u orden de reparacion.
+                vehicle:
+                  type: string
+                  description: Vehiculo en formato ano marca modelo cuando sea posible.
+                damage_area:
+                  type: string
+                  description: Area principal de dano relacionada con body repair.
+                status:
+                  type: string
+                  enum: [intacto, revision, aprobado, proceso, piezas, pintura, armado, entregado]
+                assembly_hold:
+                  type: string
+                  description: Usar piezas o suplemento si armado esta detenido.
+                body_hours_estimated:
+                  type: number
+                body_hours_week:
+                  type: number
+                notes:
+                  type: string
+                technician_reply:
+                  type: string
+                  description: Respuesta del tecnico especialista con progreso, pendientes, riesgos y siguiente accion.
+                transcription_text:
+                  type: string
+                  description: Texto importante transcrito desde la foto del RO.
+                source:
+                  type: string
+                  enum: [gpt_photo, gpt_pdf, gpt_text, app_manual]
+                  default: gpt_photo
+                checks:
+                  type: array
+                  minItems: 6
+                  maxItems: 6
+                  items:
+                    type: integer
+                    enum: [0, 1]
+                materials:
+                  type: array
+                  items:
+                    type: string
+                history:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Resultado de la actualizacion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  ro_number:
+                    type: string
+                  updated_at:
+                    type: string
+                  error:
+                    type: string
