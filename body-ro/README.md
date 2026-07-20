@@ -1,55 +1,63 @@
 # Body RO Tracker
 
-Aplicación web para controlar ROs de enderezado y reparación desde tablet.
+Aplicacion web para controlar ROs de enderezado y reparacion desde tablet.
 
-## Flujo
+## Flujo recomendado
 
-1. El GPT personalizado en iPhone escanea la foto del RO.
-2. El GPT extrae solo datos útiles para body repair.
-3. El GPT manda JSON a Google Apps Script.
-4. Apps Script guarda o actualiza la fila en Google Sheets.
-5. La app en GitHub Pages lee Google Sheets y muestra los ROs en la tablet.
+1. Tomas foto de los ROs actuales desde ChatGPT.
+2. Un GPT personalizado lee la foto y transcribe solo datos utiles para body repair.
+3. El GPT llama la Action `upsertBodyRoFromPhoto`.
+4. Google Apps Script guarda o actualiza el RO en Google Sheets.
+5. La app en GitHub Pages sincroniza la Sheet y muestra los ROs actuales en la tablet.
 
-## Qué incluye
+## Que incluye
 
 - ROs actuales
 - ROs terminados
 - Reingreso de un RO terminado si el carro vuelve al taller
-- Estados: intacto, desarmado revisión, desarmado aprobado, en proceso, esperando piezas, en pintura, armado, entregado
-- Armado esperando piezas / suplemento sin perder el estado principal `Armado`
+- Estados: intacto, revision, aprobado, proceso, piezas, pintura, armado, entregado
+- Armado esperando piezas / suplemento sin perder el estado principal `armado`
 - Horas semanales por RO
 - Checklist body
 - Hardware y materiales
-- Sync manual con Google Sheets
+- Respuesta de tecnico especialista
+- Subida/pegado local de texto de RO
+- Sync manual con Google Sheets mediante Apps Script
 
-## Conexión con Google Sheets
+## Conexion con Google Sheets
 
-En la app abre **Configurar Sheets / Apps Script** y guarda:
+En la app abre **Config** y guarda:
 
 - URL de la Web App de Apps Script, terminada en `/exec`
 - API key privada configurada en `apps-script/Code.gs`
 
-La app guarda esa conexión solo en `localStorage` de la tablet. La API key no se publica en GitHub.
+Luego toca **Sincronizar** para traer los ROs que el GPT haya actualizado en Google Sheets.
+
+La app guarda esa conexion solo en `localStorage` de la tablet. La API key no se publica en GitHub.
 
 ## Despliegue de Apps Script
 
 1. Crea una Google Sheet.
-2. Abre **Extensions → Apps Script**.
+2. Abre **Extensions -> Apps Script**.
 3. Copia el contenido de `apps-script/Code.gs`.
 4. Cambia `API_KEY = 'CHANGE_ME_PRIVATE_KEY'` por una clave privada tuya.
-5. Deploy → New deployment → Web app.
+5. Deploy -> New deployment -> Web app.
 6. Execute as: Me.
 7. Who has access: Anyone with the link.
-8. Copia la URL `/exec` y configúrala en la app.
+8. Copia la URL `/exec`.
+9. En la app Body RO Tracker abre **Config** y pega la URL + API key.
 
 ## Custom GPT Action
 
-`apps-script/openapi.yaml` es la base para configurar la Action del GPT personalizado.
+1. En ChatGPT crea un GPT personalizado.
+2. En instrucciones, pega el contenido de `gpt-instructions.md`.
+3. En Actions, crea una nueva Action.
+4. Pega el contenido de `apps-script/openapi.yaml`.
+5. Cambia `https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec` por tu URL real de Apps Script.
+6. Prueba la Action con un RO de ejemplo.
 
-El GPT debe enviar solo datos estructurados. La foto del RO se usa dentro de ChatGPT para extraer información, pero no se guarda en la nube.
+El GPT debe enviar datos estructurados. La foto del RO se usa dentro de ChatGPT para extraer informacion, y Apps Script guarda en Sheets solo los campos utiles del RO.
 
 ## URL esperada en GitHub Pages
-
-Cuando el branch se mergee a `main` y GitHub Pages esté activo, la app quedará en:
 
 `https://romuloyair-lang.github.io/Finanzas-/body-ro/`
