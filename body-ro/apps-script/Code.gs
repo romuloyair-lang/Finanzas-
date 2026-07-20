@@ -15,6 +15,9 @@ const HEADERS = [
   'body_hours_estimated',
   'body_hours_week',
   'notes',
+  'technician_reply',
+  'transcription_text',
+  'source',
   'is_finished',
   'delivered_at',
   'checklist_done',
@@ -25,14 +28,15 @@ const HEADERS = [
 ];
 
 function doGet(e) {
+  const params = e && e.parameter ? e.parameter : {};
+  const callback = params.callback || '';
   try {
-    const params = e && e.parameter ? e.parameter : {};
     requireKey_(params.apiKey || params.key);
     const action = params.action || 'list';
-    if (action === 'list') return json_({ ok: true, ros: listRos_() });
-    return json_({ ok: false, error: 'Unsupported GET action: ' + action });
+    if (action === 'list') return json_({ ok: true, ros: listRos_() }, callback);
+    return json_({ ok: false, error: 'Unsupported GET action: ' + action }, callback);
   } catch (err) {
-    return json_({ ok: false, error: String(err && err.message ? err.message : err) });
+    return json_({ ok: false, error: String(err && err.message ? err.message : err) }, callback);
   }
 }
 
@@ -46,7 +50,7 @@ function doPost(e) {
     if (action === 'upsert_ro') {
       const ro = normalizeRo_(body.data || body.ro || body);
       upsertRo_(ro);
-      return json_({ ok: true, ro_number: ro.ro_number });
+      return json_({ ok: true, ro_number: ro.ro_number, updated_at: ro.updated_at });
     }
 
     if (action === 'save_all') {
@@ -126,22 +130,26 @@ function findRowByRo_(sh, roNumber) {
 }
 
 function normalizeRo_(input, forceFinished) {
+  input = input || {};
   const finished = forceFinished === true || input.is_finished === true || input.finished === true || input.status === 'entregado';
-  const status = input.status || input.current_status || (finished ? 'entregado' : 'intacto');
+  const status = input.status || input.current_status || (finished ? 'entregado' : 'revision');
   const ro = {
     ro_number: String(input.ro_number || input.ro || '').trim(),
     vehicle: input.vehicle || input.vehiculo || '',
     damage_area: input.damage_area || input.area || '',
     status: status,
     assembly_hold: status === 'armado' ? (input.assembly_hold || input.armadoWait || '') : '',
-    body_hours_estimated: Number(input.body_hours_estimated || input.est || 0),
+    body_hours_estimated: Number(input.body_hours_estimated || input.estimated_hours || input.est || 0),
     body_hours_week: Number(input.body_hours_week || input.week || 0),
     notes: input.notes || input.notas || '',
+    technician_reply: input.technician_reply || input.technicianReply || input.techReply || '',
+    transcription_text: input.transcription_text || input.transcription || input.raw_text || '',
+    source: input.source || 'gpt_photo',
     is_finished: finished ? 'TRUE' : 'FALSE',
     delivered_at: input.delivered_at || input.deliveredAt || '',
-    checklist_done: JSON.stringify(input.checklist_done || input.checks || [0, 0, 0, 0, 0, 0]),
+    checklist_done: JSON.stringify(input.checklist_done || input.checks || [1, 0, 0, 0, 0, 0]),
     materials_json: JSON.stringify(input.materials_json || input.materials || []),
-    history_json: JSON.stringify(input.history_json || input.history || []),
+    history_json: JSON.stringify(input.history_json || input.history || ['RO actualizado por GPT']),
     created_at: input.created_at || '',
     updated_at: input.updated_at || ''
   };
@@ -154,6 +162,12 @@ function normalizeRo_(input, forceFinished) {
   return ro;
 }
 
-function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+function json_(obj, callback) {
+  const text = JSON.stringify(obj);
+  if (callback) {
+    return ContentService
+      .createTextOutput(String(callback).replace(/[^\w.$]/g, '') + '(' + text + ');')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
+  return ContentService.createTextOutput(text).setMimeType(ContentService.MimeType.JSON);
 }
